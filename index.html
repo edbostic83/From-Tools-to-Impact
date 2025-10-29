@@ -41,7 +41,7 @@
             --gold2:#EBC46B;
             --bg:#2D3748;
             --card-bg: #1A202C;
-            --text-color: #F7FAFC;
+            --text-color: #F7FAFC; /* Soft White */
         }
 
         /* ===== Living Lab skin (THEME DECORATIONS) ===== */
@@ -123,27 +123,29 @@
             scroll-behavior: smooth 
         }
         
-        /* Sidebar Link Readability Fix */
+        /* Sidebar/Mobile Nav Link Fixes */
         aside a { color: var(--text-color); }
         aside a:hover { background-color: rgba(255,255,255,0.1); } 
         .header-bg, .sparkle { color: var(--text-color) !important; }
 
         /* WCAG Contrast Fix: Bump Faint Gray Text to a Readable Contrast (gray-600) */
-        .text-gray-400 { color: #718096 !important; } 
+        .text-gray-400 { color: #A0AEC0 !important; } /* Bumped to gray-400 for better visibility on dark gray backgrounds */
 
         .glow { 
             background: var(--card-bg); 
             box-shadow: 0 10px 30px rgba(0,0,0,.5), 0 0 0 1px rgba(253,214,129,.1);
-            color: var(--text-color);
+            color: var(--text-color); /* Ensures main text in card is white */
         }
+        .glow h2, .glow p, .glow li { color: var(--text-color); } /* Forces all internal text to white */
+
         .lift:hover { transform: translateY(-2px); box-shadow: 0 12px 22px rgba(0,0,0,.4) }
         
         /* Input/Select Fields & Label Fix */
         label { color: var(--text-color); } /* CRITICAL FIX: Ensures label text is white on dark card background */
         input, textarea, select {
             background: #4A5568;
-            border: 1px solid #4A5568;
-            color: var(--text-color);
+            border: 1:04 PM 1px solid #4A5568;
+            color: var(--text-color) !important; /* CRITICAL FIX: Ensures typed/selected text is visible */
         }
         input::placeholder, textarea::placeholder { color: #A0AEC0; }
         input:focus, textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(253,214,129,.3); }
@@ -387,7 +389,7 @@
                     <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="downloadPlan()">Download</button>
                     <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="copyPlan()">Copy Raw Text</button>
                     <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="copyPlannerEmailPrompt()">Copy AI Polish Prompt</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="emailElementText('planner-output','Tool-to-Impact Planner')">Email</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="emailElementText('planner-output','Tool-to-Impact-Planner')">Email</button>
                 </div>
                 <div id="planner-output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm"></div>
             </section>
@@ -821,6 +823,7 @@
             const body = ($(id)?.textContent || '').trim();
             if (body.length > 1500) { 
                 showToast('Warning: Text is long—copy it or download instead.', 'info'); 
+                return; // Prevent long mailto link
             }
             mail(subject, body);
         };
