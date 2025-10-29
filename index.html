@@ -1,60 +1,100 @@
-<script>
-    /* ---------- tiny helpers ---------- */
-    const $ = (id) => document.getElementById(id);
-    const show = (id) => { const el = $(id); if (el) el.classList.remove('hidden'); };
-    const text = (id) => ($(id)?.value || '').trim();
-    const setOut = (id, s) => { const el = $(id); if (el) { el.textContent = s; show(id); } };
-    const dl = (filename, text) => {
-      const blob = new Blob([text], {type: 'text/plain'});
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-      a.download = filename; a.click(); URL.revokeObjectURL(a.href);
-    };
-    const copyTxt = async (s) => { try { await navigator.clipboard.writeText(s); alert('Copied.'); } catch { alert('Copy failed.'); } };
-    const mail = (subject, body) => { location.href = `mailto:edbostic83@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`; };
+/* ---------- tiny helpers ---------- */
+const $ = (id) => document.getElementById(id);
+const show = (id) => { const el = $(id); if (el) el.classList.remove('hidden'); };
+const text = (id) => ($(id)?.value || '').trim();
+const setOut = (id, s) => { const el = $(id); if (el) { el.textContent = s; show(id); } };
+const dl = (filename, text) => {
+    const blob = new Blob([text], {type: 'text/plain'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = filename; a.click(); URL.revokeObjectURL(a.href);
+};
+
+// JAZZY UPGRADE: Replaces disruptive alert() with a smooth, non-blocking toast.
+const showToast = (message, type) => {
+    const toastEl = $('toast-notification');
+    if (!toastEl) { console.warn('Toast element missing.'); alert(message); return; }
+
+    toastEl.textContent = message;
+    toastEl.className = `fixed bottom-4 right-4 p-3 rounded-lg shadow-xl text-white transition-all duration-300 opacity-0 translate-y-full`;
+    toastEl.classList.add('show', (type === 'success' ? 'bg-green-600' : type === 'error' ? 'bg-red-600' : 'bg-blue-600'));
     
-    /* ---------- help chips ---------- */
-    window.toggleChip = (btn) => {
-      const wrap = btn.closest('.chip-wrap'); if (!wrap) return;
-      wrap.classList.toggle('show');
-      setTimeout(() => wrap.classList.remove('show'), 3500);
-    };
+    // Animate in
+    requestAnimationFrame(() => {
+        toastEl.classList.add('opacity-100', 'translate-y-0');
+    });
+
+    // Animate out
+    setTimeout(() => {
+        toastEl.classList.remove('opacity-100', 'translate-y-0');
+        toastEl.classList.add('opacity-0', 'translate-y-full');
+    }, 3000);
+};
+
+const copyTxt = async (s) => {
+    try {
+        await navigator.clipboard.writeText(s);
+        showToast('Copied to clipboard!', 'success');
+    } catch {
+        showToast('Copy failed.', 'error');
+    }
+};
+const mail = (subject, body) => { location.href = `mailto:edbostic83@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`; };
+
+/* ---------- help chips ---------- */
+window.toggleChip = (btn) => {
+    const wrap = btn.closest('.chip-wrap'); if (!wrap) return;
+    wrap.classList.toggle('show');
+    setTimeout(() => wrap.classList.remove('show'), 3500);
+};
+
+/* ---------- Impact Ladder tabs ---------- */
+window.switchTab = (who) => {
+    // Correctly uses the $ helper
+    (who==='student' ? $('ladder-lea') : $('ladder-stu'))?.classList.add('hidden');
+    (who==='student' ? $('ladder-stu') : $('ladder-lea'))?.classList.remove('hidden');
     
-    /* ---------- Impact Ladder tabs ---------- */
-    window.switchTab = (who) => {
-      (who==='student' ? $('ladder-lea') : $('ladder-stu'))?.classList.add('hidden');
-      (who==='student' ? $('ladder-stu') : $('ladder-lea'))?.classList.remove('hidden');
-      if (who==='student') { $('tab-stu')?.classList.add('border-b-2','border-[--gold]'); $('tab-lea')?.classList.remove('border-b-2','border-[--gold]'); }
-      else { $('tab-lea')?.classList.add('border-b-2','border-[--gold]'); $('tab-stu')?.classList.remove('border-b-2','border-[--gold]'); }
-    };
-    window.ladderPrefill = (who) => {
-      // gentle prefill to the planner from ladder examples
-      $('toolName') && ($('toolName').value = who==='student' ? 'Flip / LLM' : 'Data dashboard');
-      $('targetBehavior') && ($('targetBehavior').value = who==='student' ? 'Peer feedback every Wednesday' : '15-min weekly data huddle');
-      $('measurableOutcome') && ($('measurableOutcome').value = who==='student' ? '+1 rubric level in 4 weeks' : '+5% STAAR item mastery in 6 weeks');
-      $('owner') && ($('owner').value = who==='student' ? '6th ELA team • weekly' : 'Campus ILT • Fridays');
-    };
-    
-    /* ---------- Planner ---------- */
-    window.generatePlanner = () => {
-      const plan = [
+    // The gold accent needs to be visible in the dark theme
+    const goldClasses = ['border-b-2','border-[--gold]'];
+    if (who==='student') { 
+        $('tab-stu')?.classList.add(...goldClasses); $('tab-lea')?.classList.remove(...goldClasses); 
+        $('tab-stu')?.classList.remove('text-gray-500'); $('tab-lea')?.classList.add('text-gray-500'); 
+    }
+    else { 
+        $('tab-lea')?.classList.add(...goldClasses); $('tab-stu')?.classList.remove(...goldClasses); 
+        $('tab-lea')?.classList.remove('text-gray-500'); $('tab-stu')?.classList.add('text-gray-500'); 
+    }
+};
+window.ladderPrefill = (who) => {
+    $('toolName') && ($('toolName').value = who==='student' ? 'Flip / LLM' : 'Data dashboard');
+    $('targetBehavior') && ($('targetBehavior').value = who==='student' ? 'Peer feedback every Wednesday' : '15-min weekly data huddle');
+    $('measurableOutcome') && ($('measurableOutcome').value = who==='student' ? '+1 rubric level in 4 weeks' : '+5% STAAR item mastery in 6 weeks');
+    $('owner') && ($('owner').value = who==='student' ? '6th ELA team • weekly' : 'Campus ILT • Fridays');
+};
+
+/* ---------- Planner ---------- */
+window.generatePlanner = () => {
+    const plan = [
         `Tool: ${text('toolName') || '(name the app/platform)'}`,
         `Use → Habit: ${text('targetBehavior') || '(what people will do, on a cadence)'}`,
         `Outcome (2–6 wks): ${text('measurableOutcome') || '(one measurable change)'}`,
         `Owner + Cadence: ${text('owner') || '(who + how often)'}`,
         `Standards/Policy: ${text('standardsPolicy') || '(paste exact wording: TEKS/EDGAR/local)'}`,
-      ].join('\n');
-      setOut('planner-output', plan);
-    };
-    window.openEvidenceModal = () => {
-      alert('Evidence ideas:\n• Before/after artifacts\n• Counts (submissions, completions)\n• Short surveys or rubric snapshots\n• Screenshots/links to the work');
-    };
-    window.downloadPlan   = () => dl('tool-to-impact-plan.txt', $('planner-output')?.textContent || '');
-    window.copyPlan       = () => copyTxt($('planner-output')?.textContent || '');
-    window.emailElementText = (id, subject) => mail(subject, $(id)?.textContent || '');
-    
-    /* ---------- Data Prep Coach ---------- */
-    window.makeDataSpec = () => {
-      const spec = [
+    ].join('\n');
+    setOut('planner-output', plan);
+};
+
+// JAZZY UPGRADE: Replaced alert with toast notification
+window.openEvidenceModal = () => {
+    showToast('Evidence ideas: Before/after artifacts, submission counts, short surveys/rubric snapshots, screenshots/links.', 'info');
+};
+
+window.downloadPlan    = () => dl('tool-to-impact-plan.txt', $('planner-output')?.textContent || '');
+window.copyPlan        = () => copyTxt($('planner-output')?.textContent || '');
+window.emailElementText = (id, subject) => mail(subject, $(id)?.textContent || '');
+
+/* ---------- Data Prep Coach ---------- */
+window.makeDataSpec = () => {
+    const spec = [
         `Goal/Decision: ${text('dp_goal')}`,
         `Primary metric: ${text('dp_outcome')}`,
         `Grain: ${text('dp_unit')}`,
@@ -65,50 +105,50 @@
         `Filters: ${text('dp_filters')}`,
         `Privacy: ${text('dp_privacy')}`,
         `Quality: ${text('dp_quality')}`
-      ].join('\n');
-      setOut('dp_output', spec);
-    };
-    window.downloadCSVTemplate = () => {
-      const cols = (text('dp_fields') || 'student_id,date,present,period,reason_code').split(/\s*,\s*/).join(',');
-      dl('template.csv', cols + '\n');
-    };
-    window.downloadPrepChecklist = () => {
-      const ck = `Checklist
+    ].join('\n');
+    setOut('dp_output', spec);
+};
+window.downloadCSVTemplate = () => {
+    const cols = (text('dp_fields') || 'student_id,date,present,period,reason_code').split(/\s*,\s*/).join(',');
+    dl('template.csv', cols + '\n');
+};
+window.downloadPrepChecklist = () => {
+    const ck = `Checklist
     [ ] Fields named and ordered
     [ ] Grain matches question
     [ ] IDs consistent across tables
     [ ] Filters declared
     [ ] Privacy (no PII in uploads)
     [ ] Quality checks (missing/outliers)`;
-      dl('data-prep-checklist.txt', ck);
-    };
-    window.copyDataPrompt = () => {
-      const p = `You are a data prep coach. Using the spec below, generate:
+    dl('data-prep-checklist.txt', ck);
+};
+window.copyDataPrompt = () => {
+    const p = `You are a data prep coach. Using the spec below, generate:
     1) a schema with column names/types,
     2) sample rows,
     3) a quality-check list.
     
     Spec:
     ${$('dp_output')?.textContent || '(fill the form first)'}`;
-      copyTxt(p);
-    };
-    
+    copyTxt(p);
+};
+
 /* ---------- Platform Finder ---------- */
 window.generatePlatformRec = () => {
-  const goal = $('pf_goal')?.value || 'create';
-  const inputs = Array.from($('pf_inputs')?.selectedOptions || []).map(o => o.value);
-  const outputs = Array.from($('pf_outputs')?.selectedOptions || []).map(o => o.value);
-  const flags = [
-    $('pf_privacy')?.checked ? 'FERPA/PII' : null,
-    $('pf_blocked')?.checked ? 'no installs' : null,
-    $('pf_no_cost')?.checked ? 'free only' : null,
-    $('pf_low_skill')?.checked ? 'low skill' : null,
-    $('pf_offline')?.checked ? 'offline/export' : null,
-  ].filter(Boolean);
-  const collab = $('pf_collab')?.value;
-  const time = $('pf_time')?.value, risk = $('pf_risk')?.value;
+    const goal = $('pf_goal')?.value || 'create';
+    const inputs = Array.from($('pf_inputs')?.selectedOptions || []).map(o => o.value);
+    const outputs = Array.from($('pf_outputs')?.selectedOptions || []).map(o => o.value);
+    const flags = [
+        $('pf_privacy')?.checked ? 'FERPA/PII' : null,
+        $('pf_blocked')?.checked ? 'no installs' : null,
+        $('pf_no_cost')?.checked ? 'free only' : null,
+        $('pf_low_skill')?.checked ? 'low skill' : null,
+        $('pf_offline')?.checked ? 'offline/export' : null,
+    ].filter(Boolean);
+    const collab = $('pf_collab')?.value;
+    const time = $('pf_time')?.value, risk = $('pf_risk')?.value;
 
-  const rec = `Goal: ${goal}
+    const rec = `Goal: ${goal}
 Inputs: ${inputs.join(', ') || 'text'}
 Outputs: ${outputs.join(', ') || 'document'}
 Constraints: ${flags.join(' | ') || '—'}
@@ -121,7 +161,7 @@ Try:
 Search string:
 "${goal} ${inputs.join(' ')} to ${outputs.join(' ')} education ferpa template"`;
 
-  setOut('pf_output', rec);
+    setOut('pf_output', rec);
 };
 
 window.downloadPFChecklist = () => dl('platform-checklist.txt',
@@ -133,55 +173,69 @@ window.downloadPFChecklist = () => dl('platform-checklist.txt',
 [ ] Cost: free/pilot/budgeted
 [ ] Time-to-value <= chosen window`);
 
+// CRITICAL FIX: Cleaned up the redundant and buggy logic here.
 window.copySearchString = () => {
-  const goal = $('pf_goal')?.value || 'create';
-  const inputs = Array.from($('pf_inputs')?.selectedOptions || []).map(o => o.value);
-  const outputs = Array.from($('pf_outputs')?.selectedOptions || []).map(o => o.value);
-  copyTxt(`"${goal} ${inputs.join(' ')} to ${outputs.join(' ')} education ferpa template"`);
+    const goal = $('pf_goal')?.value || 'create';
+    const inputs = Array.from($('pf_inputs')?.selectedOptions || []).map(o => o.value);
+    const outputs = Array.from($('pf_outputs')?.selectedOptions || []).map(o => o.value);
+    copyTxt(`"${goal} ${inputs.join(' ')} to ${outputs.join(' ')} education ferpa template"`);
 };
 
-      const goal = $('#pf_goal')?.value || 'create';
-      const inputs = Array.from($('#pf_inputs')?.selectedOptions||[]).map(o=>o.value);
-      const outputs = Array.from($('#pf_outputs')?.selectedOptions||[]).map(o=>o.value);
-      copyTxt(`"${goal} ${inputs.join(' ')} to ${outputs.join(' ')} education ferpa template"`);
-    };
-    
-    /* ---------- Guided Mode (minimal) ---------- */
-    const guided = {
-      teacher: ['Pick tool', 'Write habit', 'Set outcome', 'Choose evidence'],
-      leader:  ['Pick dashboard', 'Schedule huddles', 'Name metric movement', 'Decide artifacts'],
-      central: ['Pick workflow', 'Cadence + owners', 'Risk/Policy', 'Evidence']
-    };
-    let gWho = 'teacher', gStep = 0;
-    window.startGuided = (who) => {
-      gWho = who; gStep = 0;
-      $('guided-panel')?.classList.remove('hidden');
-      $('guided-why').textContent = 
+/* ---------- Guided Mode (minimal) ---------- */
+const guided = {
+    teacher: ['Pick tool', 'Write habit', 'Set outcome', 'Choose evidence'],
+    leader:  ['Pick dashboard', 'Schedule huddles', 'Name metric movement', 'Decide artifacts'],
+    central: ['Pick workflow', 'Cadence + owners', 'Risk/Policy', 'Evidence'],
+    coach:   ['Observe, Pick Tool', 'Target 1-2 Behavior', 'Set Growth Goal', 'Collect Artifacts'], // Added coach
+};
+let gWho = 'teacher', gStep = 0;
+
+window.startGuided = (who) => {
+    gWho = who; gStep = 1; // Start at step 1 for display clarity
+    $('guided-panel')?.classList.remove('hidden');
+    $('guided-why').textContent = 
         who==='central' ? 'Lock a weekly habit that survives leadership churn.' :
         who==='leader'  ? 'Tiny routines > giant plans. Ship a cadence.' :
-                           'Aim for behavior change, not “played with a tool.”';
-      window.nextGuided();
-    };
-    window.nextGuided = () => {
-      const steps = guided[gWho]; if (!steps) return;
-      $('guided-step-num').textContent = gStep+1;
-      $('guided-step-title').textContent = steps[gStep];
-      $('guided-step-body').textContent = 'Use the fields below to fill this step; advance when you’ve written a concrete, observable behavior.';
-      gStep = (gStep + 1) % steps.length;
-    };
-    window.prevGuided = () => { gStep = Math.max(0, gStep-1); window.nextGuided(); };
+        who==='coach'   ? 'Focus on observable behavior change in small cycles.' :
+                          'Aim for behavior change, not “played with a tool.”';
+    window.updateGuidedUI();
+};
+
+// FIX: Logic no longer loops. It stops at the "Done" state.
+const updateGuidedUI = () => {
+    const steps = guided[gWho]; if (!steps) return;
+    const isFinished = gStep > steps.length;
     
-    /* ---------- Connect buttons (Instagram/Twitter/Email) ---------- */
-    window.openInsta = () => window.open('https://instagram.com/cultureaintjustcupcaskes','_blank');
-    window.openTwitter = () => window.open('https://twitter.com/Msedbostic','_blank');
-    window.openHireMe = () => {
-      const body = `Hello Elizabeth,%0D%0A%0D%0AI'm interested in PD/consulting.%0D%0A
+    // UI Updates
+    $('guided-step-num').textContent = isFinished ? 'Done' : gStep;
+    $('guided-step-title').textContent = isFinished ? 'All Steps Complete' : steps[gStep - 1];
+    $('guided-step-body').textContent = isFinished ? 
+        'Great work! You have covered all key planning steps. Review and share your plan.' :
+        'Use the fields below to fill this step; advance when you’ve written a concrete, observable behavior.';
+    
+    // Button state updates
+    $('next-guided-btn').classList.toggle('hidden', isFinished);
+    $('prev-guided-btn').disabled = (gStep <= 1);
+};
+
+window.nextGuided = () => { 
+    gStep = Math.min(gStep + 1, guided[gWho].length + 1); // Max step is length + 1 (the 'Done' state)
+    updateGuidedUI();
+};
+window.prevGuided = () => { 
+    gStep = Math.max(1, gStep - 1); 
+    updateGuidedUI();
+};
+
+/* ---------- Connect buttons (Instagram/Twitter/Email) ---------- */
+window.openInsta = () => window.open('https://instagram.com/cultureaintjustcupcaskes','_blank');
+window.openTwitter = () => window.open('https://twitter.com/Msedbostic','_blank');
+window.openHireMe = () => {
+    const body = `Hello Elizabeth,%0D%0A%0D%0AI'm interested in PD/consulting.%0D%0A
     Role/Audience:%0D%0A
     Goal/Outcome:%0D%0A
     Dates/Timeline:%0D%0A
     Constraints (FERPA, cost, etc.):%0D%0A
     Thanks!`;
-      location.href = `mailto:edbostic83@gmail.com?subject=PD/Consulting%20Inquiry&body=${body}`;
-    };
-    </script>
-</body>
+    location.href = `mailto:edbostic83@gmail.com?subject=PD/Consulting%20Inquiry&body=${body}`;
+};
