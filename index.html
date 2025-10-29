@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet" />
     
     <script>
-    const $ = (id) => document.getElementById(id); // Move helper up for DOMContentLoaded
+    const $ = (id) => document.getElementById(id); 
     (function () {
         const s = document.createElement('script');
         s.src = 'https://cdn.tailwindcss.com?plugins=forms,typography&v=20251028'; 
@@ -36,12 +36,12 @@
     <style>
         /* ----------------- JAZZY DARK MODE BASE ----------------- */
         :root { 
-            --navy:#1A202C; /* Base Charcoal */
-            --gold:#FDD681; /* Accent Color */
+            --navy:#1A202C;
+            --gold:#FDD681;
             --gold2:#EBC46B;
-            --bg:#2D3748; /* Secondary Dark Gray */
-            --card-bg: #1A202C; /* Deepest background for cards (Sidebar/Tools) */
-            --text-color: #F7FAFC; /* Soft White - High Contrast Text */
+            --bg:#2D3748;
+            --card-bg: #1A202C;
+            --text-color: #F7FAFC;
         }
 
         /* ===== Living Lab skin (THEME DECORATIONS) ===== */
@@ -60,7 +60,6 @@
             position:fixed; inset:0; z-index:-2; pointer-events:none;
         }
         body::before{
-            /* subtle grid pattern */
             background:
                 linear-gradient(var(--grid) 1px, transparent 1px) 0 0/28px 28px,
                 linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0/28px 28px,
@@ -69,7 +68,6 @@
             filter: saturate(105%);
         }
         body::after{
-            /* soft vignette */
             background: radial-gradient(1200px 700px at 50% 120%, rgba(0,0,0,.45), transparent 55%);
         }
 
@@ -125,7 +123,7 @@
             scroll-behavior: smooth 
         }
         
-        /* Sidebar/Mobile Nav Link Fixes */
+        /* Sidebar Link Readability Fix */
         aside a { color: var(--text-color); }
         aside a:hover { background-color: rgba(255,255,255,0.1); } 
         .header-bg, .sparkle { color: var(--text-color) !important; }
@@ -140,7 +138,8 @@
         }
         .lift:hover { transform: translateY(-2px); box-shadow: 0 12px 22px rgba(0,0,0,.4) }
         
-        /* Input/Select Fields */
+        /* Input/Select Fields & Label Fix */
+        label { color: var(--text-color); } /* CRITICAL FIX: Ensures label text is white on dark card background */
         input, textarea, select {
             background: #4A5568;
             border: 1px solid #4A5568;
@@ -346,7 +345,7 @@
                         <p><strong>Behavior:</strong> the routine people will do (peer feedback every Wed; 15‑min data huddle Fri).</p>
                         <p><strong>Outcome:</strong> a measurable change in 2–6 weeks (+1 rubric level, −30% errors).</p>
                         <p><strong>Evidence:</strong> what you’ll collect to prove it (before/after samples, counts, screenshots).</p>
-                        <p class="text-xs text-gray-500">Tip: write the behavior as a calendar habit. If it’s not on a cadence, it won’t stick.</p>
+                        <p class="text-xs text-gray-500">Tip: write the behavior as a calendar habit. If it’s not on a cadence, it’s not real.</p>
                     </div>
                 </details>
             </section>
@@ -355,7 +354,7 @@
                 <div class="flex items-start justify-between">
                     <div>
                         <h2 class="text-2xl font-extrabold">Tool-to-Impact Planner <span class="text-xs align-middle ml-2 px-2 py-1 rounded bg-green-100 border text-white">[Human workflow]</span></h2>
-                        <p class="text-sm text-gray-400">Define the <strong>habit, owner, cadence, outcome</strong>, and the standard/policy you’re aligned to.</p>
+                        <p class="text-sm text-gray-400 mb-2">Define the <strong>habit, owner, cadence, outcome</strong>, and the standard/policy you’re aligned to.</p>
                     </div>
                 </div>
 
@@ -542,7 +541,7 @@
                             <ul class="list-disc list-inside"><li>LLM “upload file” readers (Freemium)</li><li>Specialized PDF Q&A apps (Freemium)</li></ul>
                         </div>
                         <div>
-                            <p class="p-3 border rounded w-full">Comms / Video</p>
+                            <p class="font-semibold">Comms / Video</p>
                             <ul class="list-disc list-inside"><li>Loom / Screencastify (Freemium)</li><li>Edpuzzle (Freemium)</li><li>Flip (Free)</li></ul>
                         </div>
                         <div>
@@ -682,7 +681,6 @@
 
     <script>
         /* ---------- tiny helpers ---------- */
-        // const $ = (id) => document.getElementById(id); // Defined above CDN loader
         const show = (id) => { const el = $(id); if (el) el.classList.remove('hidden'); };
         const text = (id) => ($(id)?.value || '').trim();
         const setOut = (id, s) => { const el = $(id); if (el) { el.textContent = s; show(id); } };
@@ -760,6 +758,9 @@
             $('targetBehavior') && ($('targetBehavior').value = who==='student' ? 'Peer feedback every Wednesday' : '15-min weekly data huddle');
             $('measurableOutcome') && ($('measurableOutcome').value = who==='student' ? '+1 rubric level in 4 weeks' : '+5% STAAR item mastery in 6 weeks');
             $('owner') && ($('owner').value = who==='student' ? '6th ELA team • weekly' : 'Campus ILT • Fridays');
+            
+            // UX FIX: Scroll to the Planner section after pre-filling an example
+            $('planner')?.scrollIntoView({ behavior: 'smooth' });
         };
 
         /* ===== BEGINNER HELPERS & PLANNER FUNCTIONS ===== */
@@ -854,11 +855,11 @@
             ].join('\n');
 
             const out = `BEGINNER SUMMARY\n${summary}\n\n— — —\n\nQC CHECKLIST\n${checklist}`;
-            setOut('dp_output', out); // FIXED: Target 'dp_output'
+            setOut('dp_output', out);
         };
 
         window.copyDPExplainPrompt = () => {
-            const spec = ($('dp_output')?.textContent || '').trim(); // FIXED: Target 'dp_output'
+            const spec = ($('dp_output')?.textContent || '').trim();
             const prompt = `You are a friendly, non-technical instructional coach. Rewrite the content below into: (1) a 3-sentence explanation a teacher can read aloud, and (2) a numbered, 7-step checklist. Keep language plain.\n\n---\n${spec}`;
             copyTxt(prompt);
             showToast('AI prompt copied.', 'info');
@@ -877,7 +878,7 @@
                 `Privacy: ${text('dp_privacy')}`,
                 `Quality: ${text('dp_quality')}`
             ].join('\n');
-            setOut('dp_output', spec); // FIXED: Target 'dp_output'
+            setOut('dp_output', spec);
         };
 
         window.downloadCSVTemplate = () => {
@@ -901,7 +902,7 @@
     3) a quality-check list.
     
     Spec:
-    ${$('dp_output')?.textContent || '(fill the form first)'}`; // FIXED: Target 'dp_output'
+    ${$('dp_output')?.textContent || '(fill the form first)'}`;
             copyTxt(p);
         };
 
@@ -1127,7 +1128,6 @@ Search string:
                 // Check if the click occurred on the backdrop (the nav itself)
                 if (e.target === nav) hideNav(); 
             });
-            // Initial call is handled by the 'hidden' class in the HTML (already there)
         });
     </script>
     </body>
