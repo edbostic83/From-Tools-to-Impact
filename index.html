@@ -34,14 +34,14 @@
     <meta property="og:description" content="Work with AI like a strategic partner: choose the right platform, change habits, show evidence." />
 
     <style>
-        /* ----------------- JAZZY DARK MODE BASE ----------------- */
+        /* ----------------- JAZZY DARK MODE BASE (Default/Fallback) ----------------- */
         :root { 
             --navy:#1A202C;
             --gold:#FDD681;
             --gold2:#EBC46B;
             --bg:#2D3748;
-            --card-bg: #1A202C; /* Deepest background for cards (Sidebar/Tools) */
-            --text-color: #F7FAFC; /* Soft White - High Contrast Text */
+            --card-bg: #1A202C; 
+            --text-color: #F7FAFC;
         }
 
         /* ===== Living Lab skin (THEME DECORATIONS) ===== */
@@ -54,11 +54,7 @@
         }
 
         /* Lab grid + vignette behind everything */
-        body::before,
-        body::after{
-            content:"";
-            position:fixed; inset:0; z-index:-2; pointer-events:none;
-        }
+        body::before, body::after{ content:""; position:fixed; inset:0; z-index:-2; pointer-events:none; }
         body::before{
             background:
                 linear-gradient(var(--grid) 1px, transparent 1px) 0 0/28px 28px,
@@ -67,126 +63,121 @@
                 radial-gradient(900px 500px at 85% 10%, rgba(26,32,44,.25), transparent 55%);
             filter: saturate(105%);
         }
-        body::after{
-            background: radial-gradient(1200px 700px at 50% 120%, rgba(0,0,0,.45), transparent 55%);
-        }
+        body::after{ background: radial-gradient(1200px 700px at 50% 120%, rgba(0,0,0,.45), transparent 55%); }
 
         /* Corner vines (decor only) */
-        .lab-vines{
-            position:fixed; inset:0; z-index:-1; pointer-events:none;
-        }
+        .lab-vines{ position:fixed; inset:0; z-index:-1; pointer-events:none; }
         .lab-vines svg{ position:absolute; opacity:.45; filter:saturate(110%); }
         .lab-vines .vine-tl{ top:-20px; left:-10px; width:min(36vw,520px); }
         .lab-vines .vine-br{ bottom:-30px; right:-10px; width:min(40vw,640px); transform:scaleX(-1) rotate(-2deg); }
 
         /* Section dividers with lab glyphs */
-        .lab-divider{
-            position:relative; height:18px; margin:28px 0;
-        }
-        .lab-divider::before{
-            content:""; position:absolute; inset:auto 0; top:8px;
-            height:1px; background:linear-gradient(90deg, transparent, var(--beaker), transparent);
-        }
-        .lab-divider::after{
-            content:""; position:absolute; left:50%; top:50%; transform:translate(-50%, -50%);
-            width:44px; height:44px; border-radius:9999px;
-            background:
-                radial-gradient(circle at 50% 50%, var(--beaker), transparent 60%),
-                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="%23FDD681" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v4.5l-4.5 7.8A3 3 0 0 0 7 20h10a3 3 0 0 0 2.5-4.7L15 7.5V3"/><path d="M6 14h12"/></svg>') center/22px 22px no-repeat;
-            opacity:.35;
-        }
+        .lab-divider{ position:relative; height:18px; margin:28px 0; }
+        .lab-divider::before{ content:""; position:absolute; inset:auto 0; top:8px; height:1px; background:linear-gradient(90deg, transparent, var(--beaker), transparent); }
+        .lab-divider::after{ content:""; position:absolute; left:50%; top:50%; transform:translate(-50%, -50%); width:44px; height:44px; border-radius:9999px; background: radial-gradient(circle at 50% 50%, var(--beaker), transparent 60%), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="%23FDD681" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v4.5l-4.5 7.8A3 3 0 0 0 7 20h10a3 3 0 0 0 2.5-4.7L15 7.5V3"/><path d="M6 14h12"/></svg>') center/22px 22px no-repeat; opacity:.35; }
 
         /* Highlight lines under h2s */
-        h2 + .underline-anim,
-        .underline-anim{
-            height:2px; border-radius:9999px;
-            background:linear-gradient(90deg, var(--gold), #fff, var(--gold));
-            background-size:200% 100%; animation:shimmer 4s linear infinite;
-            opacity:.65;
-        }
+        h2 + .underline-anim, .underline-anim{ height:2px; border-radius:9999px; background:linear-gradient(90deg, var(--gold), #fff, var(--gold)); background-size:200% 100%; animation:shimmer 4s linear infinite; opacity:.65; }
         @keyframes shimmer{ to{ background-position:-200% 0; } }
+        @media (prefers-reduced-motion: reduce){ .underline-anim{ animation:none } }
+        .hide-decor body::before, .hide-decor body::after, .hide-decor .lab-vines, .hide-decor .lab-divider{ display:none !important; }
 
-        /* Motion/visual safety */
-        @media (prefers-reduced-motion: reduce){
-            .underline-anim{ animation:none }
-        }
-        .hide-decor body::before,
-        .hide-decor body::after,
-        .hide-decor .lab-vines,
-        .hide-decor .lab-divider{ display:none !important; }
+        /* Standard Glow/Shadow */
+        .glow { box-shadow: 0 10px 30px rgba(0,0,0,.5), 0 0 0 1px rgba(253,214,129,.1); }
         
-        /* ----------------- BASE STYLES & OVERRIDES ----------------- */
-        html, body { 
-            font-family: 'Inter', system-ui, Segoe UI, Roboto, sans-serif; 
-            background: var(--bg); 
-            color: var(--text-color); 
-            scroll-behavior: smooth 
-        }
-        
-        /* --- FIX 1: Split shadow from color/bg rules --- */
-        .glow {
-            box-shadow: 0 10px 30px rgba(0,0,0,.5), 0 0 0 1px rgba(253,214,129,.1);
-        }
-        /* New utility class for dark panels (sidebar, mobile, hero) */
-        .card-dark {
-            background: var(--card-bg);
-            color: var(--text-color) !important;
-        }
-        .card-dark h1, .card-dark h2, .card-dark p, .card-dark a, .card-dark li, .card-dark span {
-            color: var(--text-color) !important;
-        }
+        /* Utility for Dark Panels */
+        .card-dark { background: var(--card-bg); color: var(--text-color) !important; }
+        .card-dark h1, .card-dark h2, .card-dark p, .card-dark a, .card-dark li, .card-dark span { color: var(--text-color) !important; }
 
-        /* --- FIX 2: Ensure text is dark on white cards --- */
-        section.bg-white, .bg-white.glow {
-            background: white !important;
-            color: #1a202c !important; /* Tailwind gray-900 */
-        }
-        .bg-white.glow h2, .bg-white.glow p, .bg-white.glow li, .bg-white.glow a, .bg-white.glow strong {
-            color: #1a202c !important; /* Forces dark text on white background */
-        }
-        /* Specific contrast bump for secondary copy on white */
-        #about .text-gray-400,
-        #planner .text-gray-400,
-        #data-prep .text-gray-400,
-        #platform-finder .text-gray-400,
-        #risen .text-gray-400,
-        #story .text-gray-400,
-        #ten-day .text-gray-400,
-        #process-plug .text-gray-400,
-        #sell .text-gray-400 {
-            color: #4A5568 !important; /* Tailwind gray-700 (Good contrast on white) */
-        }
-
-        /* Input/Select Fields & Label Fix */
-        label { color: var(--text-color) !important; } /* Ensures label text is white on dark card background */
-        input, textarea, select {
-            background: #4A5568;
-            border: 1px solid #4A5568;
-            color: var(--text-color) !important;
-        }
+        /* Input Styles */
+        label { color: var(--text-color) !important; }
+        input, textarea, select { background: #4A5568; border: 1px solid #4A5568; color: var(--text-color) !important; }
         input::placeholder, textarea::placeholder { color: #A0AEC0; }
         input:focus, textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(253,214,129,.3); }
 
-        /* General Styling */
-        aside a { color: var(--text-color); }
-        aside a:hover { background-color: rgba(255,255,255,0.1); } 
-        .header-bg, .sparkle { color: var(--text-color) !important; }
-        .mobile-nav { background: rgba(0,0,0,0.8); }
-
         /* Output Boxes */
-        #planner-output, #dp_output, #pf_output, #risen-output, #story-output, #ten-day-output, #process-plug-output, #sell-output {
-            background: #1A202C;
-            color: #B2F5EA;
-            border: 1px solid #4A5568;
-            white-space: pre-wrap;
-        }
+        #planner-output, #dp_output, #pf_output, #risen-output, #story-output, #ten-day-output, #process-plug-output, #sell-output { background: #1A202C; color: #B2F5EA; border: 1px solid #4A5568; white-space: pre-wrap; }
 
-        /* Minimal safety net */
+        /* Standard Buttons */
         button, .btn { padding:.6rem 1rem; border:1px solid #4A5568; border-radius:.5rem; background:#2D3748; color:var(--text-color) }
         button.gold-btn { background:var(--gold); color:var(--navy); font-weight:700; border:0; }
         
-        /* Toast component CSS for the JS upgrade */
+        /* Mobile/Header Fixes */
+        aside a { color: var(--text-color); } aside a:hover { background-color: rgba(255,255,255,0.1); } 
+        .header-bg, .sparkle { color: var(--text-color) !important; }
+        .mobile-nav { background: rgba(0,0,0,0.8); }
         #toast-notification { z-index: 1000; min-width: 250px; }
+    </style>
+    
+    <style id="light-mode-reset">
+        /* ===== Global light palette (Override) ===== */
+        :root {
+            --navy: #1A202C;        /* text on light */
+            --gold: #F1C76A;
+            --gold2:#D9AE4F;
+            --bg:   #F6F8FB;        /* page background */
+            --card-bg: #FFFFFF;     /* white cards */
+            --text-color:#1A202C;   /* default text on light */
+        }
+
+        /* Page background + default text */
+        html, body { background: var(--bg) !important; color: var(--text-color) !important; }
+
+        /* Hero/header stays deep but readable */
+        .header-bg.sparkle { 
+            background: linear-gradient(180deg,#0f172a 0%,#111827 60%,#1f2937 100%) !important;
+            color: #fff !important;
+        }
+
+        /* White cards = real black/near-black text, not gray-on-gray */
+        .glow, .bg-white.glow, section.bg-white.glow {
+            background: var(--card-bg) !important;
+            color: var(--text-color) !important;
+            box-shadow: 0 12px 30px rgba(16,24,40,.12), 0 0 0 1px rgba(2,6,23,.04) !important;
+        }
+
+        /* Fix utility greys that are too faint on white */
+        .glow .text-gray-400, .glow .text-gray-500, .glow .text-gray-600 { color: #374151 !important; }
+        .glow .text-gray-700, .glow .text-gray-800 { color: #111827 !important; }
+
+        /* Inputs on light */
+        input, textarea, select {
+            background:#fff !important;
+            border:1px solid #CBD5E1 !important;
+            color:#0f172a !important;
+        }
+        input::placeholder, textarea::placeholder { color:#6B7280 !important; }
+        input:focus, textarea:focus {
+            border-color: var(--gold) !important;
+            box-shadow: 0 0 0 3px rgba(241,199,106,.35) !important;
+        }
+
+        /* Help chips on light */
+        .chip      { background: var(--gold) !important; color:#0f172a !important; border-color: var(--gold) !important; }
+        .chip-tip  { background:#fff !important; color:#0f172a !important; border:1px solid #E5E7EB !important; }
+
+        /* Output boxes readable on light */
+        #planner-output, #dp_output, #pf_output, #risen-output, #story-output,
+        #ten-day-output, #process-plug-output, #sell-output {
+            background:#F8FAFC !important;
+            color:#0f172a !important;
+            border:1px solid #E5E7EB !important;
+        }
+
+        /* Badges on light */
+        .bg-green-100 { background:#10B981 !important; color:#fff !important; }
+        .bg-indigo-100{ background:#6366F1 !important; color:#fff !important; }
+        .bg-yellow-100{ background:#F59E0B !important; color:#fff !important; }
+
+        /* Sidebar + mobile panel on light */
+        .sidebar .glow { background:#FFFFFF !important; }
+        .mobile-panel  { background:#FFFFFF !important; color:#0f172a !important; }
+        .mobile-nav    { background:rgba(0,0,0,.35) !important; }
+
+        /* Don’t let Tailwind’s utility greys re-fade your text inside cards */
+        .glow a { color:#0f172a !important; }
+        .glow a.underline, .glow a.text-[--gold] { color: var(--gold) !important; }
+        [data-decorations-toggle] { color:#0f172a !important; }
     </style>
 </head>
 
@@ -218,7 +209,8 @@
     </div>
 
     <div id="mobileNav" class="mobile-nav hidden fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label="Navigation drawer">
-        <div class="mobile-panel card-dark" role="document"> <div class="flex items-center justify-between">
+        <div class="mobile-panel card-dark" role="document">
+            <div class="flex items-center justify-between">
                 <div class="font-extrabold text-[--gold] text-lg">The Living Lab</div>
                 <button id="mobileCloseBtn" class="p-2" type="button" aria-label="Close menu">✕</button>
                 </div>
@@ -262,13 +254,20 @@
                         onclick="document.documentElement.classList.toggle('hide-decor')">
                         Toggle Decorations
                     </button>
+                    <button data-decorations-toggle onclick="
+                        const el=document.getElementById('light-mode-reset');
+                        el.disabled = !el.disabled;
+                        " class="w-full mt-2 border rounded px-3 py-1 bg-gray-700 hover:bg-gray-600 text-xs">
+                        Toggle Light/Dark
+                    </button>
                 </div>
             </div>
         </aside>
 
         <main id="main">
             <div class="lab-divider" aria-hidden="true"></div>
-            <section id="home" class="header-bg sparkle text-white rounded-xl p-6 glow card-dark"> <h1 class="text-4xl font-extrabold mb-2 accent">From Tools to Impact</h1>
+            <section id="home" class="header-bg sparkle text-white rounded-xl p-6 glow card-dark">
+                <h1 class="text-4xl font-extrabold mb-2 accent">From Tools to Impact</h1>
                 <p class="text-lg/7 opacity-95">Turn AI into a thinking partner, not a crutch. Pick the right tool, change the habit, show the evidence.</p>
             </section>
 
@@ -284,7 +283,7 @@
                     <li><strong>Platform Finder</strong> helps you pick the right category and search strings (with examples).</li>
                     <li><strong>Story</strong> makes the 3-liner; <strong>10-Day</strong> seeds realistic steps (templates included).</li>
                 </ol>
-                <p class="text-xs text-gray-500 mt-2">Badges: <span class="font-semibold">[Drop-in AI]</span> = paste directly into a model; <span class="font-semibold">[Human workflow]</span> = use with your team.</p>
+                <p class="text-xs text-gray-500 mt-2">Badges: <span class="font-semibold">[Drop-in AI]</span> = paste directly into a model; [Human workflow] = use with your team.</p>
             </section>
 
             <div class="lab-divider" aria-hidden="true"></div>
@@ -304,7 +303,8 @@
                     <div class="bg-amber-800 border-l-4 border-amber-400 p-3 rounded mb-3 text-white">
                         <p id="guided-why" class="text-sm"></p>
                     </div>
-                    <div class="bg-gray-700 border rounded p-4 card-dark"> <p class="text-sm mb-2"><strong>Step <span id="guided-step-num">1</span>:</strong> <span id="guided-step-title"></span></p>
+                    <div class="bg-gray-700 border rounded p-4 card-dark">
+                        <p class="text-sm mb-2"><strong>Step <span id="guided-step-num">1</span>:</strong> <span id="guided-step-title"></span></p>
                         <div id="guided-step-body" class="text-sm text-gray-200"></div>
                         <div class="mt-3 flex gap-2">
                             <button id="prev-guided-btn" class="px-3 py-2 rounded border" type="button" onclick="prevGuided()">Back</button>
@@ -339,7 +339,8 @@
                     </div>
                     <div class="mt-2 flex gap-2 text-sm">
                         <a href="#planner" class="underline text-[--gold]">Turn into a plan →</a>
-                        <button class="px-2 py-1 border rounded bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="ladderPrefill('student')">Fill an example for me</button> </div>
+                        <button class="px-2 py-1 border rounded bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="ladderPrefill('student')">Fill an example for me</button>
+                        </div>
                 </div>
                 <div id="ladder-lea" class="hidden mt-3">
                     <div class="grid md:grid-cols-5 gap-3 text-center text-sm">
@@ -351,7 +352,8 @@
                     </div>
                     <div class="mt-2 flex gap-2 text-sm">
                         <a href="#planner" class="underline text-[--gold]">Make the 10‑day sprint →</a>
-                        <button class="px-2 py-1 border rounded bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="ladderPrefill('leader')">Fill an example for me</button> </div>
+                        <button class="px-2 py-1 border rounded bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="ladderPrefill('leader')">Fill an example for me</button>
+                    </div>
                 </div>
 
                 <details class="mt-4 p-3 rounded text-sm">
@@ -407,7 +409,8 @@
                     <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="copyPlannerEmailPrompt()">Copy AI Polish Prompt</button>
                     <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="emailElementText('planner-output','Tool-to-Impact-Planner')">Email</button>
                 </div>
-                <div id="planner-output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div> </section>
+                <div id="planner-output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div>
+            </section>
 
             <div class="lab-divider" aria-hidden="true"></div>
             <section id="data-prep" class="mt-6 bg-white rounded-xl p-6 glow">
@@ -470,7 +473,8 @@
                     <p><strong>Example (attendance):</strong> fields → <code>student_id,date,present,period,reason_code</code> | grain → <code>student/day</code> | join keys → <code>student_id</code></p>
                 </div>
 
-                <div id="dp_output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div> </section>
+                <div id="dp_output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div>
+            </section>
 
             <div class="lab-divider" aria-hidden="true"></div>
             <section id="platform-finder" class="mt-6 bg-white rounded-xl p-6 glow">
@@ -569,7 +573,8 @@
                     </div>
                     <p class="mt-3 text-xs text-gray-500">Search like: <code>“{goal} {inputs} to {outputs} education ferpa template”</code></p>
                 </details>
-                <div id="pf_output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div> </section>
+                <div id="pf_output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div>
+            </section>
 
             <div class="lab-divider" aria-hidden="true"></div>
             <section id="risen" class="mt-6 bg-white rounded-xl p-6 glow">
@@ -602,7 +607,8 @@
                     <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="copyRISEN()">Copy to AI</button>
                     <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="emailElementText('risen-output','RISEN Prompt')">Email</button>
                 </div>
-                <div id="risen-output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div> </section>
+                <div id="risen-output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div>
+            </section>
 
             <div class="lab-divider" aria-hidden="true"></div>
             <section id="story" class="mt-6 bg-white rounded-xl p-6 glow">
@@ -619,7 +625,8 @@
                     <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="copyStory()">Copy</button>
                     <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="emailElementText('story-output','3-Sentence Story')">Email</button>
                 </div>
-                <div id="story-output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div> </section>
+                <div id="story-output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div>
+            </section>
 
             <div class="lab-divider" aria-hidden="true"></div>
             <section id="ten-day" class="mt-6 bg-white rounded-xl p-6 glow">
@@ -643,7 +650,8 @@
                     <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="dl10Day()">Download</button>
                     <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="copy10Day()">Copy</button>
                 </div>
-                <div id="ten-day-output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div> </section>
+                <div id="ten-day-output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div>
+            </section>
 
             <div class="lab-divider" aria-hidden="true"></div>
             <section id="process-plug" class="mt-6 bg-white rounded-xl p-6 glow">
@@ -661,7 +669,8 @@
                     <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="copyProcessPlug()">Copy</button>
                     <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="emailElementText('process-plug-output','Process Plug-In')">Email</button>
                 </div>
-                <div id="process-plug-output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div> </section>
+                <div id="process-plug-output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div>
+            </section>
 
             <div class="lab-divider" aria-hidden="true"></div>
             <section id="sell" class="mt-6 bg-white rounded-xl p-6 glow">
@@ -679,7 +688,8 @@
                     <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="copySellIt()">Copy</button>
                     <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="emailElementText('sell-output','Value Proposition')">Email</button>
                 </div>
-                <div id="sell-output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div> </section>
+                <div id="sell-output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div>
+            </section>
             
             <div class="lab-divider" aria-hidden="true"></div>
             <section id="connect" class="mt-6 bg-white rounded-xl p-6 glow">
