@@ -123,36 +123,55 @@
             scroll-behavior: smooth 
         }
         
-        /* Sidebar Link Readability Fix */
-        aside a { color: var(--text-color); }
-        aside a:hover { background-color: rgba(255,255,255,0.1); } 
-        .header-bg, .sparkle { color: var(--text-color) !important; }
-
-        /* CRITICAL: Force all headers, list items, and general text inside the card to be white */
-        .glow { 
-            background: var(--card-bg); 
+        /* --- FIX 1: Split shadow from color/bg rules --- */
+        .glow {
             box-shadow: 0 10px 30px rgba(0,0,0,.5), 0 0 0 1px rgba(253,214,129,.1);
-            color: var(--text-color); /* Primary text color for the card */
         }
-        .glow h1, .glow h2, .glow p, .glow li, .glow span, .glow a { color: var(--text-color) !important; } /* CRITICAL FIX: Forces all text elements inside the cards to white */
-        .glow strong { color: var(--text-color) !important; }
-        
-        /* Specific List Item Fixes (Fixing the invisible numbered list) */
-        .glow ol, .glow ul { 
-            list-style-type: decimal;
-            margin-left: 1.25rem;
+        /* New utility class for dark panels (sidebar, mobile, hero) */
+        .card-dark {
+            background: var(--card-bg);
+            color: var(--text-color) !important;
+        }
+        .card-dark h1, .card-dark h2, .card-dark p, .card-dark a, .card-dark li, .card-dark span {
             color: var(--text-color) !important;
         }
 
+        /* --- FIX 2: Ensure text is dark on white cards --- */
+        section.bg-white, .bg-white.glow {
+            background: white !important;
+            color: #1a202c !important; /* Tailwind gray-900 */
+        }
+        .bg-white.glow h2, .bg-white.glow p, .bg-white.glow li, .bg-white.glow a, .bg-white.glow strong {
+            color: #1a202c !important; /* Forces dark text on white background */
+        }
+        /* Specific contrast bump for secondary copy on white */
+        #about .text-gray-400,
+        #planner .text-gray-400,
+        #data-prep .text-gray-400,
+        #platform-finder .text-gray-400,
+        #risen .text-gray-400,
+        #story .text-gray-400,
+        #ten-day .text-gray-400,
+        #process-plug .text-gray-400,
+        #sell .text-gray-400 {
+            color: #4A5568 !important; /* Tailwind gray-700 (Good contrast on white) */
+        }
+
         /* Input/Select Fields & Label Fix */
-        label { color: var(--text-color) !important; } /* CRITICAL FIX: Ensures label text is white on dark card background */
+        label { color: var(--text-color) !important; } /* Ensures label text is white on dark card background */
         input, textarea, select {
             background: #4A5568;
             border: 1px solid #4A5568;
-            color: var(--text-color) !important; /* CRITICAL FIX: Ensures typed/selected text is visible */
+            color: var(--text-color) !important;
         }
         input::placeholder, textarea::placeholder { color: #A0AEC0; }
         input:focus, textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(253,214,129,.3); }
+
+        /* General Styling */
+        aside a { color: var(--text-color); }
+        aside a:hover { background-color: rgba(255,255,255,0.1); } 
+        .header-bg, .sparkle { color: var(--text-color) !important; }
+        .mobile-nav { background: rgba(0,0,0,0.8); }
 
         /* Output Boxes */
         #planner-output, #dp_output, #pf_output, #risen-output, #story-output, #ten-day-output, #process-plug-output, #sell-output {
@@ -162,22 +181,12 @@
             white-space: pre-wrap;
         }
 
-        /* Other element fixes */
-        .text-gray-400 { color: #A0AEC0 !important; } /* Secondary text color */
-        .lift:hover { transform: translateY(-2px); box-shadow: 0 12px 22px rgba(0,0,0,.4) }
-
         /* Minimal safety net */
         button, .btn { padding:.6rem 1rem; border:1px solid #4A5568; border-radius:.5rem; background:#2D3748; color:var(--text-color) }
         button.gold-btn { background:var(--gold); color:var(--navy); font-weight:700; border:0; }
         
         /* Toast component CSS for the JS upgrade */
-        #toast-notification {
-            z-index: 1000;
-            min-width: 250px;
-        }
-        
-        /* Mobile Drawer Specific Fix */
-        .mobile-nav { background: rgba(0,0,0,0.8); }
+        #toast-notification { z-index: 1000; min-width: 250px; }
     </style>
 </head>
 
@@ -209,8 +218,7 @@
     </div>
 
     <div id="mobileNav" class="mobile-nav hidden fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label="Navigation drawer">
-        <div class="mobile-panel" role="document">
-            <div class="flex items-center justify-between">
+        <div class="mobile-panel card-dark" role="document"> <div class="flex items-center justify-between">
                 <div class="font-extrabold text-[--gold] text-lg">The Living Lab</div>
                 <button id="mobileCloseBtn" class="p-2" type="button" aria-label="Close menu">✕</button>
                 </div>
@@ -233,8 +241,7 @@
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-[260px_minmax(0,1fr)] gap-6 py-6">
         <aside class="hidden md:block sidebar" aria-label="Section navigation">
-            <div class="rounded-xl p-4 glow">
-                <div class="text-xl font-extrabold text-[--gold] mb-1">The Living Lab</div>
+            <div class="rounded-xl p-4 glow card-dark"> <div class="text-xl font-extrabold text-[--gold] mb-1">The Living Lab</div>
                 <p class="text-xs text-gray-400 mb-3">From Tools to Impact</p>
                 <nav class="space-y-1 text-sm">
                     <a class="block px-3 py-2 rounded hover:bg-gray-700" href="#about">What is this?</a>
@@ -260,12 +267,13 @@
         </aside>
 
         <main id="main">
-            <div class="lab-divider" aria-hidden="true"></div> <section id="home" class="header-bg sparkle text-white rounded-xl p-6 glow">
-                <h1 class="text-4xl font-extrabold mb-2 accent">From Tools to Impact</h1>
+            <div class="lab-divider" aria-hidden="true"></div>
+            <section id="home" class="header-bg sparkle text-white rounded-xl p-6 glow card-dark"> <h1 class="text-4xl font-extrabold mb-2 accent">From Tools to Impact</h1>
                 <p class="text-lg/7 opacity-95">Turn AI into a thinking partner, not a crutch. Pick the right tool, change the habit, show the evidence.</p>
             </section>
 
-            <div class="lab-divider" aria-hidden="true"></div> <section id="about" class="mt-6 bg-white rounded-xl p-6 glow">
+            <div class="lab-divider" aria-hidden="true"></div>
+            <section id="about" class="mt-6 bg-white rounded-xl p-6 glow">
                 <div class="underline-anim mb-3"></div>
                 <h2 class="text-2xl font-extrabold mb-2">What is this place? How do I use it?</h2>
                 <p class="text-gray-400 mb-3">A do-it-now site for teachers, leaders, and central office. Every section tells you why it matters, what to type, and gives you something to <strong>copy, download, or email</strong>.</p>
@@ -279,7 +287,8 @@
                 <p class="text-xs text-gray-500 mt-2">Badges: <span class="font-semibold">[Drop-in AI]</span> = paste directly into a model; <span class="font-semibold">[Human workflow]</span> = use with your team.</p>
             </section>
 
-            <div class="lab-divider" aria-hidden="true"></div> <section id="guided" class="mt-6 bg-white rounded-xl p-6 glow">
+            <div class="lab-divider" aria-hidden="true"></div>
+            <section id="guided" class="mt-6 bg-white rounded-xl p-6 glow">
                 <div class="flex items-center gap-2 mb-2">
                     <span class="text-xs px-2 py-1 rounded bg-yellow-100 border text-black">7 minutes</span>
                     <h2 class="text-2xl font-extrabold">Guided Mode</h2>
@@ -295,8 +304,7 @@
                     <div class="bg-amber-800 border-l-4 border-amber-400 p-3 rounded mb-3 text-white">
                         <p id="guided-why" class="text-sm"></p>
                     </div>
-                    <div class="bg-gray-700 border rounded p-4">
-                        <p class="text-sm mb-2"><strong>Step <span id="guided-step-num">1</span>:</strong> <span id="guided-step-title"></span></p>
+                    <div class="bg-gray-700 border rounded p-4 card-dark"> <p class="text-sm mb-2"><strong>Step <span id="guided-step-num">1</span>:</strong> <span id="guided-step-title"></span></p>
                         <div id="guided-step-body" class="text-sm text-gray-200"></div>
                         <div class="mt-3 flex gap-2">
                             <button id="prev-guided-btn" class="px-3 py-2 rounded border" type="button" onclick="prevGuided()">Back</button>
@@ -306,7 +314,8 @@
                 </div>
             </section>
 
-            <div class="lab-divider" aria-hidden="true"></div> <section id="framework" class="mt-6 bg-white rounded-xl p-6 glow">
+            <div class="lab-divider" aria-hidden="true"></div>
+            <section id="framework" class="mt-6 bg-white rounded-xl p-6 glow">
                 <h2 class="text-2xl font-extrabold mb-1">Core Framework: The Impact Ladder</h2>
                 <div class="text-sm text-gray-400 mb-3">Move from <strong>tool</strong> → <strong>use</strong> → <strong>behavior</strong> → <strong>outcome</strong> → <strong>evidence</strong>.</div>
                 <div class="grid grid-cols-5 text-center text-xs font-bold text-gray-400 mb-4">
@@ -330,8 +339,7 @@
                     </div>
                     <div class="mt-2 flex gap-2 text-sm">
                         <a href="#planner" class="underline text-[--gold]">Turn into a plan →</a>
-                        <button class="px-2 py-1 border rounded bg-gray-700 hover:bg-gray-600" type="button" onclick="ladderPrefill('student')">Fill an example for me</button>
-                        </div>
+                        <button class="px-2 py-1 border rounded bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="ladderPrefill('student')">Fill an example for me</button> </div>
                 </div>
                 <div id="ladder-lea" class="hidden mt-3">
                     <div class="grid md:grid-cols-5 gap-3 text-center text-sm">
@@ -343,8 +351,7 @@
                     </div>
                     <div class="mt-2 flex gap-2 text-sm">
                         <a href="#planner" class="underline text-[--gold]">Make the 10‑day sprint →</a>
-                        <button class="px-2 py-1 border rounded bg-gray-700 hover:bg-gray-600" type="button" onclick="ladderPrefill('leader')">Fill an example for me</button>
-                    </div>
+                        <button class="px-2 py-1 border rounded bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="ladderPrefill('leader')">Fill an example for me</button> </div>
                 </div>
 
                 <details class="mt-4 p-3 rounded text-sm">
@@ -360,7 +367,8 @@
                 </details>
             </section>
 
-            <div class="lab-divider" aria-hidden="true"></div> <section id="planner" class="mt-6 bg-white rounded-xl p-6 glow">
+            <div class="lab-divider" aria-hidden="true"></div>
+            <section id="planner" class="mt-6 bg-white rounded-xl p-6 glow">
                 <div class="flex items-start justify-between">
                     <div>
                         <h2 class="text-2xl font-extrabold">Tool-to-Impact Planner <span class="text-xs align-middle ml-2 px-2 py-1 rounded bg-green-100 border text-white">[Human workflow]</span></h2>
@@ -393,16 +401,16 @@
 
                 <div class="mt-3 flex flex-wrap gap-2">
                     <button class="gold-btn px-4 py-2 rounded lift" type="button" onclick="plannerExplain()">Generate Plan</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="openEvidenceModal('planner')">Evidence Menu</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="downloadPlan()">Download</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="copyPlan()">Copy Raw Text</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="copyPlannerEmailPrompt()">Copy AI Polish Prompt</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="emailElementText('planner-output','Tool-to-Impact-Planner')">Email</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="openEvidenceModal('planner')">Evidence Menu</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="downloadPlan()">Download</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="copyPlan()">Copy Raw Text</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="copyPlannerEmailPrompt()">Copy AI Polish Prompt</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="emailElementText('planner-output','Tool-to-Impact-Planner')">Email</button>
                 </div>
-                <div id="planner-output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm"></div>
-            </section>
+                <div id="planner-output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div> </section>
 
-            <div class="lab-divider" aria-hidden="true"></div> <section id="data-prep" class="mt-6 bg-white rounded-xl p-6 glow">
+            <div class="lab-divider" aria-hidden="true"></div>
+            <section id="data-prep" class="mt-6 bg-white rounded-xl p-6 glow">
                 <h2 class="text-2xl font-extrabold">Data Prep Coach <span class="text-xs ml-2 px-2 py-1 rounded bg-indigo-100 border text-white">[Drop-in AI]</span></h2>
                 <p class="text-sm text-gray-400 mb-2">Turn a messy idea into an <strong>AI-ready spec + CSV + checklist</strong>. Plain-English help chips explain terms.</p>
 
@@ -451,21 +459,21 @@
 
                 <div class="mt-3 flex flex-wrap gap-2">
                     <button class="gold-btn px-4 py-2 rounded lift" type="button" onclick="dpExplain()">Make Spec</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="downloadCSVTemplate()">CSV Template</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="downloadPrepChecklist()">Checklist</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="copyDataPrompt()">Copy AI Prompt (Raw Spec)</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="copyDPExplainPrompt()">Copy AI Explain Prompt</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="emailElementText('dp_output','Data Prep Spec')">Email</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="downloadCSVTemplate()">CSV Template</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="downloadPrepChecklist()">Checklist</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="copyDataPrompt()">Copy AI Prompt (Raw Spec)</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="copyDPExplainPrompt()">Copy AI Explain Prompt</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="emailElementText('dp_output','Data Prep Spec')">Email</button>
                 </div>
 
                 <div class="mt-4 text-xs text-gray-400">
                     <p><strong>Example (attendance):</strong> fields → <code>student_id,date,present,period,reason_code</code> | grain → <code>student/day</code> | join keys → <code>student_id</code></p>
                 </div>
 
-                <div id="dp_output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm"></div>
-            </section>
+                <div id="dp_output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div> </section>
 
-            <div class="lab-divider" aria-hidden="true"></div> <section id="platform-finder" class="mt-6 bg-white rounded-xl p-6 glow">
+            <div class="lab-divider" aria-hidden="true"></div>
+            <section id="platform-finder" class="mt-6 bg-white rounded-xl p-6 glow">
                 <h2 class="text-2xl font-extrabold">AI Platform Finder <span class="text-xs ml-2 px-2 py-1 rounded bg-indigo-100 border text-white">[Drop-in AI + Human]</span></h2>
                 <p class="text-sm text-gray-400 mb-2">Choose by need, not hype. Pick categories, get example tools, copy search strings, use the rubric.</p>
 
@@ -525,10 +533,10 @@
 
                 <div class="mt-3 flex flex-wrap gap-2">
                     <button class="gold-btn px-4 py-2 rounded lift" type="button" onclick="pfExplain()">Generate Rec</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="downloadPFChecklist()">Download Checklist</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="copySearchString()">Copy Search String</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="copyPFTradeoffsPrompt()">Copy AI Memo Prompt</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="emailElementText('pf_output','Platform Finder Rec')">Email</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="downloadPFChecklist()">Download Checklist</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="copySearchString()">Copy Search String</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="copyPFTradeoffsPrompt()">Copy AI Memo Prompt</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="emailElementText('pf_output','Platform Finder Rec')">Email</button>
                 </div>
 
                 <details class="mt-5 p-4 rounded text-sm">
@@ -561,10 +569,10 @@
                     </div>
                     <p class="mt-3 text-xs text-gray-500">Search like: <code>“{goal} {inputs} to {outputs} education ferpa template”</code></p>
                 </details>
-                <div id="pf_output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm"></div>
-            </section>
+                <div id="pf_output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div> </section>
 
-            <div class="lab-divider" aria-hidden="true"></div> <section id="risen" class="mt-6 bg-white rounded-xl p-6 glow">
+            <div class="lab-divider" aria-hidden="true"></div>
+            <section id="risen" class="mt-6 bg-white rounded-xl p-6 glow">
                 <h2 class="text-2xl font-extrabold">RISEN Prompt Studio <span class="text-xs ml-2 px-2 py-1 rounded bg-indigo-100 border text-white">[Drop-in AI]</span></h2>
                 <p class="text-sm text-gray-400 mb-2">Train AI to act like a critical-thinking partner: <strong>Relevance, Intent, Specificity, Execution, Navigation</strong>.</p>
                 <div class="grid gap-3">
@@ -591,13 +599,13 @@
                 </div>
                 <div class="mt-3 flex flex-wrap gap-2">
                     <button class="gold-btn px-4 py-2 rounded lift" type="button" onclick="generateRISEN()">Generate Prompt</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="copyRISEN()">Copy to AI</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="emailElementText('risen-output','RISEN Prompt')">Email</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="copyRISEN()">Copy to AI</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="emailElementText('risen-output','RISEN Prompt')">Email</button>
                 </div>
-                <div id="risen-output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm"></div>
-            </section>
+                <div id="risen-output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div> </section>
 
-            <div class="lab-divider" aria-hidden="true"></div> <section id="story" class="mt-6 bg-white rounded-xl p-6 glow">
+            <div class="lab-divider" aria-hidden="true"></div>
+            <section id="story" class="mt-6 bg-white rounded-xl p-6 glow">
                 <h2 class="text-2xl font-extrabold">3-Sentence Story <span class="text-xs ml-2 px-2 py-1 rounded bg-green-100 border text-white">[Human workflow]</span></h2>
                 <p class="text-sm text-gray-400 mb-2">Build a concise narrative: **Setup → Action → Win**.</p>
                 <div class="grid gap-3">
@@ -608,13 +616,13 @@
                 </div>
                 <div class="mt-3 flex flex-wrap gap-2">
                     <button class="gold-btn px-4 py-2 rounded lift" type="button" onclick="generateStory()">Generate Story</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="copyStory()">Copy</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="emailElementText('story-output','3-Sentence Story')">Email</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="copyStory()">Copy</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="emailElementText('story-output','3-Sentence Story')">Email</button>
                 </div>
-                <div id="story-output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm"></div>
-            </section>
+                <div id="story-output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div> </section>
 
-            <div class="lab-divider" aria-hidden="true"></div> <section id="ten-day" class="mt-6 bg-white rounded-xl p-6 glow">
+            <div class="lab-divider" aria-hidden="true"></div>
+            <section id="ten-day" class="mt-6 bg-white rounded-xl p-6 glow">
                 <h2 class="text-2xl font-extrabold">10-Day Plan (Sprint) <span class="text-xs ml-2 px-2 py-1 rounded bg-green-100 border text-white">[Human workflow]</span></h2>
                 <p class="text-sm text-gray-400 mb-2">A high-cadence, short-cycle plan to drive early evidence.</p>
                 <div class="grid md:grid-cols-2 gap-3">
@@ -632,13 +640,13 @@
                 </div>
                 <div class="mt-3 flex flex-wrap gap-2">
                     <button class="gold-btn px-4 py-2 rounded lift" type="button" onclick="generate10Day()">Generate Plan</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="dl10Day()">Download</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="copy10Day()">Copy</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="dl10Day()">Download</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="copy10Day()">Copy</button>
                 </div>
-                <div id="ten-day-output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm"></div>
-            </section>
+                <div id="ten-day-output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div> </section>
 
-            <div class="lab-divider" aria-hidden="true"></div> <section id="process-plug" class="mt-6 bg-white rounded-xl p-6 glow">
+            <div class="lab-divider" aria-hidden="true"></div>
+            <section id="process-plug" class="mt-6 bg-white rounded-xl p-6 glow">
                 <h2 class="text-2xl font-extrabold">Process Plug-In <span class="text-xs ml-2 px-2 py-1 rounded bg-green-100 border text-white">[Human workflow]</span></h2>
                 <p class="text-sm text-gray-400 mb-2">Identify a pain point in an existing meeting and plug in a tool-driven action.</p>
                 <div class="grid gap-3">
@@ -650,13 +658,13 @@
                 </div>
                 <div class="mt-3 flex flex-wrap gap-2">
                     <button class="gold-btn px-4 py-2 rounded lift" type="button" onclick="generateProcessPlug()">Generate Plug-In</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="copyProcessPlug()">Copy</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="emailElementText('process-plug-output','Process Plug-In')">Email</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="copyProcessPlug()">Copy</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="emailElementText('process-plug-output','Process Plug-In')">Email</button>
                 </div>
-                <div id="process-plug-output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm"></div>
-            </section>
+                <div id="process-plug-output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div> </section>
 
-            <div class="lab-divider" aria-hidden="true"></div> <section id="sell" class="mt-6 bg-white rounded-xl p-6 glow">
+            <div class="lab-divider" aria-hidden="true"></div>
+            <section id="sell" class="mt-6 bg-white rounded-xl p-6 glow">
                 <h2 class="text-2xl font-extrabold">Sell It (Value Prop) <span class="text-xs ml-2 px-2 py-1 rounded bg-green-100 border text-white">[Human workflow]</span></h2>
                 <p class="text-sm text-gray-400 mb-2">Define your pitch by focusing on solving stakeholder pain points.</p>
                 <div class="grid gap-3">
@@ -668,19 +676,19 @@
                 </div>
                 <div class="mt-3 flex flex-wrap gap-2">
                     <button class="gold-btn px-4 py-2 rounded lift" type="button" onclick="generateSellIt()">Generate Pitch</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="copySellIt()">Copy</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="emailElementText('sell-output','Value Proposition')">Email</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="copySellIt()">Copy</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="emailElementText('sell-output','Value Proposition')">Email</button>
                 </div>
-                <div id="sell-output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm"></div>
-            </section>
+                <div id="sell-output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div> </section>
             
-            <div class="lab-divider" aria-hidden="true"></div> <section id="connect" class="mt-6 bg-white rounded-xl p-6 glow">
+            <div class="lab-divider" aria-hidden="true"></div>
+            <section id="connect" class="mt-6 bg-white rounded-xl p-6 glow">
                 <h2 class="text-2xl font-extrabold">Join the Conversation & Connect</h2>
                 <p class="text-sm text-gray-400 mb-3">Connect with Elizabeth Bostic for PD, consulting, or general discussion.</p>
                 <div class="flex flex-wrap gap-2">
                     <button class="gold-btn lift px-4 py-2 rounded" type="button" onclick="openInsta()">Instagram</button>
                     <button class="gold-btn lift px-4 py-2 rounded" type="button" onclick="openTwitter()">Twitter</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="openHireMe()">Inquire about PD/Consulting</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="openHireMe()">Inquire about PD/Consulting</button>
                 </div>
             </section>
 
