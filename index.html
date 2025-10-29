@@ -40,8 +40,8 @@
             --gold:#FDD681;
             --gold2:#EBC46B;
             --bg:#2D3748;
-            --card-bg: #1A202C;
-            --text-color: #F7FAFC; /* Soft White */
+            --card-bg: #1A202C; /* Deepest background for cards (Sidebar/Tools) */
+            --text-color: #F7FAFC; /* Soft White - High Contrast Text */
         }
 
         /* ===== Living Lab skin (THEME DECORATIONS) ===== */
@@ -123,28 +123,32 @@
             scroll-behavior: smooth 
         }
         
-        /* Sidebar/Mobile Nav Link Fixes */
+        /* Sidebar Link Readability Fix */
         aside a { color: var(--text-color); }
         aside a:hover { background-color: rgba(255,255,255,0.1); } 
         .header-bg, .sparkle { color: var(--text-color) !important; }
 
-        /* WCAG Contrast Fix: Bump Faint Gray Text to a Readable Contrast (gray-600) */
-        .text-gray-400 { color: #A0AEC0 !important; } /* Bumped to gray-400 for better visibility on dark gray backgrounds */
-
+        /* CRITICAL: Force all headers, list items, and general text inside the card to be white */
         .glow { 
             background: var(--card-bg); 
             box-shadow: 0 10px 30px rgba(0,0,0,.5), 0 0 0 1px rgba(253,214,129,.1);
-            color: var(--text-color); /* Ensures main text in card is white */
+            color: var(--text-color); /* Primary text color for the card */
         }
-        .glow h2, .glow p, .glow li { color: var(--text-color); } /* Forces all internal text to white */
-
-        .lift:hover { transform: translateY(-2px); box-shadow: 0 12px 22px rgba(0,0,0,.4) }
+        .glow h1, .glow h2, .glow p, .glow li, .glow span, .glow a { color: var(--text-color) !important; } /* CRITICAL FIX: Forces all text elements inside the cards to white */
+        .glow strong { color: var(--text-color) !important; }
         
+        /* Specific List Item Fixes (Fixing the invisible numbered list) */
+        .glow ol, .glow ul { 
+            list-style-type: decimal;
+            margin-left: 1.25rem;
+            color: var(--text-color) !important;
+        }
+
         /* Input/Select Fields & Label Fix */
-        label { color: var(--text-color); } /* CRITICAL FIX: Ensures label text is white on dark card background */
+        label { color: var(--text-color) !important; } /* CRITICAL FIX: Ensures label text is white on dark card background */
         input, textarea, select {
             background: #4A5568;
-            border: 1:04 PM 1px solid #4A5568;
+            border: 1px solid #4A5568;
             color: var(--text-color) !important; /* CRITICAL FIX: Ensures typed/selected text is visible */
         }
         input::placeholder, textarea::placeholder { color: #A0AEC0; }
@@ -157,6 +161,10 @@
             border: 1px solid #4A5568;
             white-space: pre-wrap;
         }
+
+        /* Other element fixes */
+        .text-gray-400 { color: #A0AEC0 !important; } /* Secondary text color */
+        .lift:hover { transform: translateY(-2px); box-shadow: 0 12px 22px rgba(0,0,0,.4) }
 
         /* Minimal safety net */
         button, .btn { padding:.6rem 1rem; border:1px solid #4A5568; border-radius:.5rem; background:#2D3748; color:var(--text-color) }
