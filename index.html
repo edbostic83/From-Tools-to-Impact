@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="light">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -16,9 +16,9 @@
     (function () {
         const s = document.createElement('script');
         s.src = 'https://cdn.tailwindcss.com?plugins=forms,typography&v=20251028'; 
-        s.defer = true;
         s.onload = () => console.log('Tailwind CDN loaded successfully');
         
+        // Keep the unpkg fallback
         s.onerror = () => {
             console.warn('Tailwind CDN blocked; loading fallback CSS');
             const l = document.createElement('link');
@@ -34,15 +34,18 @@
     <meta property="og:description" content="Work with AI like a strategic partner: choose the right platform, change habits, show evidence." />
 
     <style>
-        /* ----------------- JAZZY DARK MODE BASE (Fallback/Optional Dark) ----------------- */
-        :root { 
+        /* ----------------- THEME TOKENS ----------------- */
+        :root{
             --navy:#1A202C;
             --gold:#FDD681;
             --gold2:#EBC46B;
-            --bg:#2D3748;
-            --card-bg: #1A202C; 
-            --text-color: #F7FAFC;
-            /* Lab Colors */
+            --text-dark:#1F2937;
+            --text-muted:#4B5563;
+            --bg-light:#FFFFFF;
+            --card-light:#FFFFFF;
+            --border-light:#E5E7EB;
+
+            /* Decorative Colors */
             --leaf:#8FD18C;
             --mint:#B7F5C8;
             --grid:rgba(255,255,255,.04);
@@ -50,154 +53,87 @@
             --beaker:rgba(253,214,129,.18);
         }
 
-        /* --- THEME DECORATIONS (Vines, Grid, Glow) --- */
-        body::before, body::after{ content:""; position:fixed; inset:0; z-index:-2; pointer-events:none; }
-        body::before{
-            background:
-                linear-gradient(var(--grid) 1px, transparent 1px) 0 0/28px 28px,
-                linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0/28px 28px,
-                radial-gradient(1200px 600px at 15% -10%, rgba(253,214,129,.10), transparent 60%),
-                radial-gradient(900px 500px at 85% 10%, rgba(26,32,44,.25), transparent 55%);
-            filter: saturate(105%);
+        /* ===== 1. LIGHT THEME DEFAULTS (html:not(.decor)) ===== */
+        html:not(.decor) body { 
+            background: #F5F7FB !important; /* Slightly off-white page background */
+            color: var(--text-dark) !important; 
         }
-        body::after{ background: radial-gradient(1200px 700px at 50% 120%, rgba(0,0,0,.45), transparent 55%); }
+        html:not(.decor) .glow { 
+            background: var(--card-light) !important; 
+            color: var(--text-dark) !important; 
+            box-shadow: 0 1px 2px rgba(0,0,0,.06); 
+            border:1px solid var(--border-light); 
+        }
+        html:not(.decor) .header-bg  { background:#FFFFFF !important; }
+        html:not(.decor) .sparkle    { background:none !important; }
 
-        /* Hero: faint lab glow */
-        .hero-lab { position: relative; isolation: isolate; }
-        .hero-lab::after {
-            content:""; position:absolute; inset:auto 0 -25% 0; height:200px; 
-            background: radial-gradient(ellipse at 50% 0%, rgba(59,130,246,.25), transparent 60%),
-                        radial-gradient(circle at 20% 30%, rgba(16,185,129,.18), transparent 55%),
-                        radial-gradient(circle at 80% 20%, rgba(234,179,8,.18), transparent 55%);
-            z-index:-1;
+        /* Output boxes: readable dark text on light background */
+        html:not(.decor) #planner_output,
+        html:not(.decor) #dp_output,
+        html:not(.decor) #pf_output,
+        html:not(.decor) #risen_output,
+        html:not(.decor) #story_output,
+        html:not(.decor) #ten-day_output,
+        html:not(.decor) #process-plug_output,
+        html:not(.decor) #sell_output {
+            background:#FFFFFF !important; 
+            color:#111827 !important; 
+            border:1px solid var(--border-light) !important;
         }
 
-        /* Vine corner decorations (SVG, subtle, no performance hit) */
-        .card-vines {
-            position: relative;
-            overflow: hidden;
-        }
-        .card-vines::before,
-        .card-vines::after {
-            content: "";
-            position: absolute; width: 140px; height: 140px; opacity: .12;
-            background-repeat: no-repeat; background-size: contain; pointer-events: none;
-            filter: saturate(0.9);
-        }
-        /* top-left */
-        .card-vines::before {
-            top: -10px; left: -10px;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><g fill="none" stroke="%230f5132" stroke-width="2" stroke-linecap="round"><path d="M5 110 C40 80, 60 50, 95 15"/><circle cx="38" cy="82" r="2" fill="%230f5132"/><circle cx="60" cy="56" r="2" fill="%230f5132"/></g></svg>');
-        }
-        /* bottom-right */
-        .card-vines::after {
-            bottom: -10px; right: -10px; transform: scale(-1,-1);
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><g fill="none" stroke="%230f5132" stroke-width="2" stroke-linecap="round"><path d="M5 110 C40 80, 60 50, 95 15"/><circle cx="38" cy="82" r="2" fill="%230f5132"/><circle cx="60" cy="56" r="2" fill="%230f5132"/></g></svg>');
+        /* Input/Select Fields on Light */
+        html.light input, html.light textarea, html.light select {
+            background: #FFFFFF !important;
+            color: #111827 !important;
+            border-color: #D1D5DB !important;
         }
         
-        /* Section dividers with lab glyphs */
+        /* FIX: Ensure gray text is readable on light cards */
+        .text-gray-400, .text-gray-500 { color: #4B5563 !important; } /* Tailwind gray-600 */
+        .glow h2, .glow p, .glow li, .glow a { color: var(--text-dark); }
+
+
+        /* ===== 2. DARK/DECOR MODE OVERRIDES (html.decor) ===== */
+        html.decor body { background: #2D3748 !important; color: #F7FAFC !important; }
+        html.decor .header-bg  { background: var(--navy) !important; }
+        html.decor .sparkle    {
+            background:
+                radial-gradient(1000px 400px at 10% -10%, rgba(253,214,129,.15), transparent 60%),
+                radial-gradient(800px 400px at 90% 10%, rgba(26,32,44,.25), transparent 55%),
+                linear-gradient(180deg, #1A202C 0%, #1A202C 40%, #202736 100%) !important;
+        }
+        html.decor .glow { 
+            background: #1A202C !important; 
+            color: #F7FAFC !important; 
+            box-shadow: 0 10px 30px rgba(0,0,0,.5), 0 0 0 1px rgba(253,214,129,.08) !important;
+            border: 0 !important;
+        }
+        /* Restore dark button look when decor is on */
+        html.decor .bg-gray-700.hover\:bg-gray-600 { 
+            background: #4A5568 !important; 
+            border-color: #4A5568 !important; 
+            color: #F7FAFC !important; 
+        }
+
+        /* ===== 3. GLOBAL STYLING & DECORATIONS (Shared) ===== */
+
+        /* Decorative Elements */
         .lab-divider{ position:relative; height:18px; margin:28px 0; }
         .lab-divider::before{ content:""; position:absolute; inset:auto 0; top:8px; height:1px; background:linear-gradient(90deg, transparent, var(--beaker), transparent); }
         .lab-divider::after{ content:""; position:absolute; left:50%; top:50%; transform:translate(-50%, -50%); width:44px; height:44px; border-radius:9999px; background: radial-gradient(circle at 50% 50%, var(--beaker), transparent 60%), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="%23FDD681" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v4.5l-4.5 7.8A3 3 0 0 0 7 20h10a3 3 0 0 0 2.5-4.7L15 7.5V3"/><path d="M6 14h12"/></svg>') center/22px 22px no-repeat; opacity:.35; }
 
-        /* Highlight lines under h2s */
-        h2 + .underline-anim, .underline-anim{ height:2px; border-radius:9999px; background:linear-gradient(90deg, var(--gold), #fff, var(--gold)); background-size:200% 100%; animation:shimmer 4s linear infinite; opacity:.65; }
-        @keyframes shimmer{ to{ background-position:-200% 0; } }
-        
-        /* Motion/visual safety */
-        @media (prefers-reduced-motion: reduce){ .underline-anim{ animation:none } .hero-lab::after { display:none; } }
-        .hide-decor body::before, .hide-decor body::after, .hide-decor .lab-vines, .hide-decor .lab-divider{ display:none !important; }
-
-        /* Standard Glow/Shadow (No color defined here) */
+        /* General Styling */
+        .lab-vines{ position:fixed; inset:0; z-index:-1; pointer-events:none; }
+        .lab-vines svg{ position:absolute; opacity:.45; filter:saturate(110%); }
+        .lab-vines .vine-tl{ top:-20px; left:-10px; width:min(36vw,520px); }
+        .lab-vines .vine-br{ bottom:-30px; right:-10px; width:min(40vw,640px); transform:scaleX(-1) rotate(-2deg); }
+        .mobile-nav { background: rgba(0,0,0,0.35); }
         .glow { box-shadow: 0 10px 30px rgba(0,0,0,.5), 0 0 0 1px rgba(253,214,129,.1); }
         
-        /* Utility for Dark Panels */
-        .card-dark { background: var(--card-bg); color: var(--text-color) !important; }
-        .card-dark h1, .card-dark h2, .card-dark p, .card-dark a, .card-dark li, .card-dark span { color: var(--text-color) !important; }
-
-        /* Input Styles (Dark fields on Dark Cards) */
-        label { color: var(--text-color) !important; }
-        input, textarea, select { background: #4A5568; border: 1px solid #4A5568; color: var(--text-color) !important; }
-        input::placeholder, textarea::placeholder { color: #A0AEC0; }
-        input:focus, textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 2px rgba(253,214,129,.3); }
-
-        /* Output Boxes */
-        #planner-output, #dp_output, #pf-output, #risen-output, #story-output, #ten-day-output, #process-plug-output, #sell-output { background: #1A202C; color: #B2F5EA; border: 1px solid #4A5568; white-space: pre-wrap; }
-
-        /* General Styling */
-        aside a { color: var(--text-color); } aside a:hover { background-color: rgba(255,255,255,0.1); } 
-        .header-bg, .sparkle { color: var(--text-color) !important; }
-        .mobile-nav { background: rgba(0,0,0,0.8); }
-        #toast-notification { z-index: 1000; min-width: 250px; }
-        button, .btn { padding:.6rem 1rem; border:1px solid #4A5568; border-radius:.5rem; background:#2D3748; color:var(--text-color) }
+        /* Buttons/Inputs */
+        input, textarea, select { border: 1px solid #D1D5DB; }
         button.gold-btn { background:var(--gold); color:var(--navy); font-weight:700; border:0; }
-    </style>
-    
-    <style id="light-mode-reset">
-        /* ===== Global light palette (Override) ===== */
-        :root {
-            --navy: #1A202C;        /* text on light */
-            --gold: #F1C76A;
-            --gold2:#D9AE4F;
-            --bg:   #F5F7FB;        /* page background */
-            --card-bg: #FFFFFF;     /* white cards */
-            --text-color:#111827;   /* default text on light (gray-900) */
-        }
-
-        /* Page background + default text */
-        html, body { 
-            background: var(--bg) !important; 
-            color: var(--text-color) !important; /* Forces all body text to black/navy */
-        }
-
-        /* Hero/header */
-        .header-bg.sparkle { 
-            background: #0f172a !important; /* Navy */
-            color: #fff !important;
-        }
-
-        /* FIX: Reset all content cards to light mode */
-        .glow, .bg-white.glow, section.bg-white.glow {
-            background: var(--card-bg) !important;
-            color: var(--text-color) !important;
-            box-shadow: 0 12px 30px rgba(16,24,40,.12), 0 0 0 1px rgba(2,6,23,.04) !important;
-        }
-
-        /* FIX: Ensure all headers/text inside white cards are dark/readable */
-        .glow h2, .glow p, .glow li, .glow a, .glow span, .glow strong {
-            color: var(--text-color) !important;
-        }
-
-        /* Fix utility greys that are too faint on white */
-        .glow .text-gray-400, .glow .text-gray-500, .glow .text-gray-600 { color: #374151 !important; }
-        .glow .text-gray-700, .glow .text-gray-800 { color: #111827 !important; }
-        .glow a.underline, .glow a.text-[--gold] { color: var(--gold) !important; }
-
-        /* Inputs on light */
-        input, textarea, select {
-            background:#ffffff !important;
-            border:1px solid #CBD5E1 !important;
-            color:#0f172a !important;
-        }
-        input::placeholder, textarea::placeholder { color: #6B7280 !important; }
-
-        /* Help chips on light */
-        .chip      { background: #fbbf24 !important; color:#0f172a !important; border-color: #f59e0b !important; }
-        .chip-tip  { background:#fff !important; color:#0f172a !important; border:1px solid #E5E7EB !important; }
-
-        /* Output boxes readable on light */
-        #planner-output, #dp_output, #pf_output, #risen-output, #story-output,
-        #ten-day-output, #process-plug-output, #sell-output {
-            background:#F8FAFC !important;
-            color:#0f172a !important;
-            border:1px solid #E5E7EB !important;
-        }
-
-        /* Sidebar/mobile panel on light */
-        .sidebar .glow { background:#FFFFFF !important; }
-        .mobile-panel  { background:#FFFFFF !important; color:#0f172a !important; }
-        .mobile-nav    { background:rgba(0,0,0,.35) !important; }
-        .glow a { color:#0f172a !important; } /* Final check for links */
+        .lift:hover { transform: translateY(-2px); box-shadow: 0 12px 22px rgba(0,0,0,.4) }
     </style>
 </head>
 
@@ -229,57 +165,56 @@
     </div>
 
     <div id="mobileNav" class="mobile-nav hidden fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label="Navigation drawer">
-        <div class="mobile-panel card-dark" role="document">
+        <div class="mobile-panel glow">
             <div class="flex items-center justify-between">
                 <div class="font-extrabold text-[--gold] text-lg">The Living Lab</div>
                 <button id="mobileCloseBtn" class="p-2" type="button" aria-label="Close menu">✕</button>
                 </div>
             <nav class="mt-3 space-y-1 text-sm">
-                <a class="block px-3 py-2 rounded hover:bg-gray-700" href="#about">What is this?</a>
-                <a class="block px-3 py-2 rounded hover:bg-gray-700" href="#guided">Guided Mode</a>
-                <a class="block px-3 py-2 rounded hover:bg-gray-700" href="#framework">Impact Ladder</a>
-                <a class="block px-3 py-2 rounded hover:bg-gray-700" href="#planner">Planner</a>
-                <a class="block px-3 py-2 rounded hover:bg-gray-700" href="#data-prep">Data Prep Coach</a>
-                <a class="block px-3 py-2 rounded hover:bg-gray-700" href="#platform-finder">AI Platform Finder</a>
-                <a class="block px-3 py-2 rounded hover:bg-gray-700" href="#risen">RISEN Prompt Studio</a>
-                <a class="block px-3 py-2 rounded hover:bg-gray-700" href="#story">3-Sentence Story</a>
-                <a class="block px-3 py-2 rounded hover:bg-gray-700" href="#ten-day">10-Day Plan</a>
-                <a class="block px-3 py-2 rounded hover:bg-gray-700" href="#process-plug">Process Plug-In</a>
-                <a class="block px-3 py-2 rounded hover:bg-gray-700" href="#sell">Sell It</a>
-                <a class="block px-3 py-2 rounded hover:bg-gray-700" href="#connect">Join</a>
+                <a class="block px-3 py-2 rounded hover:bg-gray-200" href="#about">What is this?</a>
+                <a class="block px-3 py-2 rounded hover:bg-gray-200" href="#guided">Guided Mode</a>
+                <a class="block px-3 py-2 rounded hover:bg-gray-200" href="#framework">Impact Ladder</a>
+                <a class="block px-3 py-2 rounded hover:bg-gray-200" href="#planner">Planner</a>
+                <a class="block px-3 py-2 rounded hover:bg-gray-200" href="#data-prep">Data Prep Coach</a>
+                <a class="block px-3 py-2 rounded hover:bg-gray-200" href="#platform-finder">AI Platform Finder</a>
+                <a class="block px-3 py-2 rounded hover:bg-gray-200" href="#risen">RISEN Prompt Studio</a>
+                <a class="block px-3 py-2 rounded hover:bg-gray-200" href="#story">3-Sentence Story</a>
+                <a class="block px-3 py-2 rounded hover:bg-gray-200" href="#ten-day">10-Day Plan</a>
+                <a class="block px-3 py-2 rounded hover:bg-gray-200" href="#process-plug">Process Plug-In</a>
+                <a class="block px-3 py-2 rounded hover:bg-gray-200" href="#sell">Sell It</a>
+                <a class="block px-3 py-2 rounded hover:bg-gray-200" href="#connect">Join</a>
             </nav>
         </div>
     </div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-[260px_minmax(0,1fr)] gap-6 py-6">
         <aside class="hidden md:block sidebar" aria-label="Section navigation">
-            <div class="rounded-xl p-4 glow card-dark">
+            <div class="rounded-xl p-4 glow">
                 <div class="text-xl font-extrabold text-[--gold] mb-1">The Living Lab</div>
                 <p class="text-xs text-gray-400 mb-3">From Tools to Impact</p>
                 <nav class="space-y-1 text-sm">
-                    <a class="block px-3 py-2 rounded hover:bg-gray-700" href="#about">What is this?</a>
-                    <a class="block px-3 py-2 rounded hover:bg-gray-700" href="#guided">Guided Mode</a>
-                    <a class="block px-3 py-2 rounded hover:bg-gray-700" href="#framework">Impact Ladder</a>
-                    <a class="block px-3 py-2 rounded hover:bg-gray-700" href="#planner">Planner</a>
-                    <a class="block px-3 py-2 rounded hover:bg-gray-700" href="#data-prep">Data Prep Coach</a>
-                    <a class="block px-3 py-2 rounded hover:bg-gray-700" href="#platform-finder">AI Platform Finder</a>
-                    <a class="block px-3 py-2 rounded hover:bg-gray-700" href="#risen">RISEN Prompt Studio</a>
-                    <a class="block px-3 py-2 rounded hover:bg-gray-700" href="#story">3-Sentence Story</a>
-                    <a class="block px-3 py-2 rounded hover:bg-gray-700" href="#ten-day">10-Day Plan</a>
-                    <a class="block px-3 py-2 rounded hover:bg-gray-700" href="#process-plug">Process Plug-In</a>
-                    <a class="block px-3 py-2 rounded hover:bg-gray-700" href="#sell">Sell It</a>
-                    <a class="block px-3 py-2 rounded hover:bg-gray-700" href="#connect">Join</a>
+                    <a class="block px-3 py-2 rounded hover:bg-gray-200" href="#about">What is this?</a>
+                    <a class="block px-3 py-2 rounded hover:bg-gray-200" href="#guided">Guided Mode</a>
+                    <a class="block px-3 py-2 rounded hover:bg-gray-200" href="#framework">Impact Ladder</a>
+                    <a class="block px-3 py-2 rounded hover:bg-gray-200" href="#planner">Planner</a>
+                    <a class="block px-3 py-2 rounded hover:bg-gray-200" href="#data-prep">Data Prep Coach</a>
+                    <a class="block px-3 py-2 rounded hover:bg-gray-200" href="#platform-finder">AI Platform Finder</a>
+                    <a class="block px-3 py-2 rounded hover:bg-gray-200" href="#risen">RISEN Prompt Studio</a>
+                    <a class="block px-3 py-2 rounded hover:bg-gray-200" href="#story">3-Sentence Story</a>
+                    <a class="block px-3 py-2 rounded hover:bg-gray-200" href="#ten-day">10-Day Plan</a>
+                    <a class="block px-3 py-2 rounded hover:bg-gray-200" href="#process-plug">Process Plug-In</a>
+                    <a class="block px-3 py-2 rounded hover:bg-gray-200" href="#sell">Sell It</a>
+                    <a class="block px-3 py-2 rounded hover:bg-gray-200" href="#connect">Join</a>
                 </nav>
-                <div class="mt-4 pt-4 border-t border-gray-700">
-                    <button id="toggle-decor" class="w-full px-3 py-1 rounded border border-gray-600 text-xs hover:bg-gray-700"
+                <div class="mt-4 pt-4 border-t border-gray-300">
+                    <button id="toggle-decor" class="w-full px-3 py-1 rounded border border-gray-600 text-xs hover:bg-gray-200"
                         onclick="document.documentElement.classList.toggle('hide-decor')">
                         Toggle Decorations
                     </button>
                     <button data-decorations-toggle onclick="
-                        const el=document.getElementById('light-mode-reset');
-                        el.disabled = !el.disabled;
-                        " class="w-full mt-2 border rounded px-3 py-1 bg-gray-700 hover:bg-gray-600 text-xs">
-                        Toggle Light/Dark
+                        document.documentElement.classList.toggle('decor');
+                        " class="w-full mt-2 border rounded px-3 py-1 border-gray-300 text-xs hover:bg-gray-200">
+                        Toggle Dark Mode
                     </button>
                 </div>
             </div>
@@ -287,12 +222,14 @@
 
         <main id="main">
             <div class="lab-divider" aria-hidden="true"></div>
-            <section id="home" class="header-bg sparkle text-white rounded-xl p-6 glow hero-lab card-dark"> <h1 class="text-4xl font-extrabold mb-2 accent">From Tools to Impact</h1>
+            <section id="home" class="header-bg sparkle text-white rounded-xl p-6 glow hero-lab">
+                <h1 class="text-4xl font-extrabold mb-2 accent">From Tools to Impact</h1>
                 <p class="text-lg/7 opacity-95">Turn AI into a thinking partner, not a crutch. Pick the right tool, change the habit, show the evidence.</p>
             </section>
 
             <div class="lab-divider" aria-hidden="true"></div>
-            <section id="about" class="mt-6 bg-white rounded-xl p-6 glow card-vines"> <div class="underline-anim mb-3"></div>
+            <section id="about" class="mt-6 bg-white rounded-xl p-6 glow card-vines">
+                <div class="underline-anim mb-3"></div>
                 <h2 class="text-2xl font-extrabold mb-2">What is this place? How do I use it?</h2>
                 <p class="text-gray-400 mb-3">A do-it-now site for teachers, leaders, and central office. Every section tells you why it matters, what to type, and gives you something to <strong>copy, download, or email</strong>.</p>
                 <ol class="list-decimal ml-5 text-sm space-y-1">
@@ -306,7 +243,8 @@
             </section>
 
             <div class="lab-divider" aria-hidden="true"></div>
-            <section id="guided" class="mt-6 bg-white rounded-xl p-6 glow card-vines"> <div class="flex items-center gap-2 mb-2">
+            <section id="guided" class="mt-6 bg-white rounded-xl p-6 glow card-vines">
+                <div class="flex items-center gap-2 mb-2">
                     <span class="text-xs px-2 py-1 rounded bg-yellow-100 border text-black">7 minutes</span>
                     <h2 class="text-2xl font-extrabold">Guided Mode</h2>
                 </div>
@@ -321,7 +259,7 @@
                     <div class="bg-amber-800 border-l-4 border-amber-400 p-3 rounded mb-3 text-white">
                         <p id="guided-why" class="text-sm"></p>
                     </div>
-                    <div class="bg-gray-700 border rounded p-4 card-dark">
+                    <div class="bg-gray-700 border rounded p-4">
                         <p class="text-sm mb-2"><strong>Step <span id="guided-step-num">1</span>:</strong> <span id="guided-step-title"></span></p>
                         <div id="guided-step-body" class="text-sm text-gray-200"></div>
                         <div class="mt-3 flex gap-2">
@@ -333,7 +271,8 @@
             </section>
 
             <div class="lab-divider" aria-hidden="true"></div>
-            <section id="framework" class="mt-6 bg-white rounded-xl p-6 glow card-vines"> <h2 class="text-2xl font-extrabold mb-1">Core Framework: The Impact Ladder</h2>
+            <section id="framework" class="mt-6 bg-white rounded-xl p-6 glow card-vines">
+                <h2 class="text-2xl font-extrabold mb-1">Core Framework: The Impact Ladder</h2>
                 <div class="text-sm text-gray-400 mb-3">Move from <strong>tool</strong> → <strong>use</strong> → <strong>behavior</strong> → <strong>outcome</strong> → <strong>evidence</strong>.</div>
                 <div class="grid grid-cols-5 text-center text-xs font-bold text-gray-400 mb-4">
                     <div class="p-2 border-b-4 border-[--navy]">1. Tool</div>
@@ -356,7 +295,7 @@
                     </div>
                     <div class="mt-2 flex gap-2 text-sm">
                         <a href="#planner" class="underline text-[--gold]">Turn into a plan →</a>
-                        <button class="px-2 py-1 border rounded bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="ladderPrefill('student')">Fill an example for me</button>
+                        <button class="px-2 py-1 border rounded bg-gray-700 hover:bg-gray-600" type="button" onclick="ladderPrefill('student')">Fill an example for me</button>
                         </div>
                 </div>
                 <div id="ladder-lea" class="hidden mt-3">
@@ -369,7 +308,7 @@
                     </div>
                     <div class="mt-2 flex gap-2 text-sm">
                         <a href="#planner" class="underline text-[--gold]">Make the 10‑day sprint →</a>
-                        <button class="px-2 py-1 border rounded bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="ladderPrefill('leader')">Fill an example for me</button>
+                        <button class="px-2 py-1 border rounded bg-gray-700 hover:bg-gray-600" type="button" onclick="ladderPrefill('leader')">Fill an example for me</button>
                     </div>
                 </div>
 
@@ -420,13 +359,13 @@
 
                 <div class="mt-3 flex flex-wrap gap-2">
                     <button class="gold-btn px-4 py-2 rounded lift" type="button" onclick="plannerExplain()">Generate Plan</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="openEvidenceModal('planner')">Evidence Menu</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="downloadPlan()">Download</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="copyPlan()">Copy Raw Text</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="copyPlannerEmailPrompt()">Copy AI Polish Prompt</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="emailElementText('planner-output','Tool-to-Impact-Planner')">Email</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="openEvidenceModal('planner')">Evidence Menu</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="downloadPlan()">Download</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="copyPlan()">Copy Raw Text</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="copyPlannerEmailPrompt()">Copy AI Polish Prompt</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="emailElementText('planner_output','Tool-to-Impact-Planner')">Email</button>
                 </div>
-                <div id="planner-output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div>
+                <div id="planner_output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm"></div>
             </section>
 
             <div class="lab-divider" aria-hidden="true"></div>
@@ -479,18 +418,18 @@
 
                 <div class="mt-3 flex flex-wrap gap-2">
                     <button class="gold-btn px-4 py-2 rounded lift" type="button" onclick="dpExplain()">Make Spec</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="downloadCSVTemplate()">CSV Template</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="downloadPrepChecklist()">Checklist</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="copyDataPrompt()">Copy AI Prompt (Raw Spec)</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="copyDPExplainPrompt()">Copy AI Explain Prompt</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="emailElementText('dp_output','Data Prep Spec')">Email</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="downloadCSVTemplate()">CSV Template</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="downloadPrepChecklist()">Checklist</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="copyDataPrompt()">Copy AI Prompt (Raw Spec)</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="copyDPExplainPrompt()">Copy AI Explain Prompt</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="emailElementText('dp_output','Data Prep Spec')">Email</button>
                 </div>
 
                 <div class="mt-4 text-xs text-gray-400">
                     <p><strong>Example (attendance):</strong> fields → <code>student_id,date,present,period,reason_code</code> | grain → <code>student/day</code> | join keys → <code>student_id</code></p>
                 </div>
 
-                <div id="dp_output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div>
+                <div id="dp_output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm"></div>
             </section>
 
             <div class="lab-divider" aria-hidden="true"></div>
@@ -554,10 +493,10 @@
 
                 <div class="mt-3 flex flex-wrap gap-2">
                     <button class="gold-btn px-4 py-2 rounded lift" type="button" onclick="pfExplain()">Generate Rec</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="downloadPFChecklist()">Download Checklist</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="copySearchString()">Copy Search String</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="copyPFTradeoffsPrompt()">Copy AI Memo Prompt</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="emailElementText('pf_output','Platform Finder Rec')">Email</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="downloadPFChecklist()">Download Checklist</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="copySearchString()">Copy Search String</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="copyPFTradeoffsPrompt()">Copy AI Memo Prompt</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="emailElementText('pf_output','Platform Finder Rec')">Email</button>
                 </div>
 
                 <details class="mt-5 p-4 rounded text-sm">
@@ -590,7 +529,7 @@
                     </div>
                     <p class="mt-3 text-xs text-gray-500">Search like: <code>“{goal} {inputs} to {outputs} education ferpa template”</code></p>
                 </details>
-                <div id="pf_output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div>
+                <div id="pf_output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm"></div>
             </section>
 
             <div class="lab-divider" aria-hidden="true"></div>
@@ -621,10 +560,10 @@
                 </div>
                 <div class="mt-3 flex flex-wrap gap-2">
                     <button class="gold-btn px-4 py-2 rounded lift" type="button" onclick="generateRISEN()">Generate Prompt</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="copyRISEN()">Copy to AI</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="emailElementText('risen-output','RISEN Prompt')">Email</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="copyRISEN()">Copy to AI</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="emailElementText('risen_output','RISEN Prompt')">Email</button>
                 </div>
-                <div id="risen-output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div>
+                <div id="risen_output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm"></div>
             </section>
 
             <div class="lab-divider" aria-hidden="true"></div>
@@ -639,10 +578,10 @@
                 </div>
                 <div class="mt-3 flex flex-wrap gap-2">
                     <button class="gold-btn px-4 py-2 rounded lift" type="button" onclick="generateStory()">Generate Story</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="copyStory()">Copy</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="emailElementText('story-output','3-Sentence Story')">Email</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="copyStory()">Copy</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="emailElementText('story_output','3-Sentence Story')">Email</button>
                 </div>
-                <div id="story-output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div>
+                <div id="story_output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm"></div>
             </section>
 
             <div class="lab-divider" aria-hidden="true"></div>
@@ -664,10 +603,10 @@
                 </div>
                 <div class="mt-3 flex flex-wrap gap-2">
                     <button class="gold-btn px-4 py-2 rounded lift" type="button" onclick="generate10Day()">Generate Plan</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="dl10Day()">Download</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="copy10Day()">Copy</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="dl10Day()">Download</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="copy10Day()">Copy</button>
                 </div>
-                <div id="ten-day-output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div>
+                <div id="ten-day_output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm"></div>
             </section>
 
             <div class="lab-divider" aria-hidden="true"></div>
@@ -683,10 +622,10 @@
                 </div>
                 <div class="mt-3 flex flex-wrap gap-2">
                     <button class="gold-btn px-4 py-2 rounded lift" type="button" onclick="generateProcessPlug()">Generate Plug-In</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="copyProcessPlug()">Copy</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="emailElementText('process-plug-output','Process Plug-In')">Email</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="copyProcessPlug()">Copy</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="emailElementText('process-plug_output','Process Plug-In')">Email</button>
                 </div>
-                <div id="process-plug-output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div>
+                <div id="process-plug_output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm"></div>
             </section>
 
             <div class="lab-divider" aria-hidden="true"></div>
@@ -702,10 +641,10 @@
                 </div>
                 <div class="mt-3 flex flex-wrap gap-2">
                     <button class="gold-btn px-4 py-2 rounded lift" type="button" onclick="generateSellIt()">Generate Pitch</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="copySellIt()">Copy</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="emailElementText('sell-output','Value Proposition')">Email</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="copySellIt()">Copy</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="emailElementText('sell_output','Value Proposition')">Email</button>
                 </div>
-                <div id="sell-output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm card-dark"></div>
+                <div id="sell_output" class="hidden mt-4 p-4 bg-gray-50 border rounded text-sm"></div>
             </section>
             
             <div class="lab-divider" aria-hidden="true"></div>
@@ -713,9 +652,9 @@
                 <h2 class="text-2xl font-extrabold">Join the Conversation & Connect</h2>
                 <p class="text-sm text-gray-400 mb-3">Connect with Elizabeth Bostic for PD, consulting, or general discussion.</p>
                 <div class="flex flex-wrap gap-2">
-                    <button class="gold-btn lift px-4 py-2 rounded" type="button" onclick="openInsta()">Instagram</button>
-                    <button class="gold-btn lift px-4 py-2 rounded" type="button" onclick="openTwitter()">Twitter</button>
-                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600 card-dark" type="button" onclick="openHireMe()">Inquire about PD/Consulting</button>
+                    <button class="gold-btn px-4 py-2 rounded lift" type="button" onclick="openInsta()">Instagram</button>
+                    <button class="gold-btn px-4 py-2 rounded lift" type="button" onclick="openTwitter()">Twitter</button>
+                    <button class="px-4 py-2 rounded border lift bg-gray-700 hover:bg-gray-600" type="button" onclick="openHireMe()">Inquire about PD/Consulting</button>
                 </div>
             </section>
 
@@ -845,11 +784,11 @@
             ].join('\n');
 
             const out = `BEGINNER SUMMARY\n${simple}\n\n— — —\n\nSENDABLE EMAIL DRAFT\n${email}`;
-            setOut('planner-output', out);
+            setOut('planner_output', out);
         };
 
         window.copyPlannerEmailPrompt = () => {
-            const body = ($('planner-output')?.textContent || '').trim();
+            const body = ($('planner_output')?.textContent || '').trim();
             const prompt = `You are an education consultant. Polish the email below for clarity and brevity, preserving the 3 sections (Goal, Action, Required Support). Keep it under 150 words.\n\n---\n${body}`;
             copyTxt(prompt);
             showToast('AI prompt copied.', 'info');
@@ -858,8 +797,8 @@
         window.openEvidenceModal = () => {
             showToast('Evidence ideas: Before/after artifacts, submission counts, short surveys/rubric snapshots, screenshots/links.', 'info');
         };
-        window.downloadPlan    = () => dl('tool-to-impact-plan.txt', $('planner-output')?.textContent || '');
-        window.copyPlan        = () => copyTxt($('planner-output')?.textContent || '');
+        window.downloadPlan    = () => dl('tool-to-impact-plan.txt', $('planner_output')?.textContent || '');
+        window.copyPlan        = () => copyTxt($('planner_output')?.textContent || '');
         
         // UX FIX: Add length check for mailto link safety
         window.emailElementText = (id, subject) => {
@@ -1040,9 +979,9 @@ Search string:
                 `E: Execution (Role/Format): ${text('e-execution') || '(e.g., Act as a curriculum coordinator, format as a 3-bullet summary)'}`,
                 `N: Navigation (Next Steps/Constraints): ${text('n-navigation') || '(e.g., Ask me three questions before executing; use Spanish)'}`
             ].join('\n');
-            setOut('risen-output', prompt);
+            setOut('risen_output', prompt);
         };
-        window.copyRISEN = () => copyTxt($('risen-output')?.textContent || '');
+        window.copyRISEN = () => copyTxt($('risen_output')?.textContent || '');
 
         /* ---------- 3-Sentence Story ---------- */
         window.generateStory = () => {
@@ -1052,9 +991,9 @@ Search string:
                 `Action (The Pivot): ${text('s_action') || '(What new, specific habit are we doing?)'}`,
                 `Future State (The Win): ${text('s_future') || '(What’s the measurable outcome/impact in 6 weeks?)'}`,
             ].join('\n');
-            setOut('story-output', story);
+            setOut('story_output', story);
         };
-        window.copyStory = () => copyTxt($('story-output')?.textContent || '');
+        window.copyStory = () => copyTxt($('story_output')?.textContent || '');
 
         /* ---------- 10-Day Plan (Sprint) ---------- */
         window.generate10Day = () => {
@@ -1069,10 +1008,10 @@ Search string:
                 `Day 7: ${text('t_d7') || 'Owners apply the adjustment and generate a second artifact.'}`,
                 `Day 10: ${text('t_d10') || 'Report 6-week outcome forecast based on artifacts and adjust cadence.'}`,
             ].join('\n');
-            setOut('ten-day-output', sprint);
+            setOut('ten-day_output', sprint);
         };
-        window.copy10Day = () => copyTxt($('ten-day-output')?.textContent || '');
-        window.dl10Day = () => dl('10-day-sprint.txt', $('ten-day-output')?.textContent || '');
+        window.copy10Day = () => copyTxt($('ten-day_output')?.textContent || '');
+        window.dl10Day = () => dl('10-day-sprint.txt', $('ten-day_output')?.textContent || '');
 
         /* ---------- Process Plug-In ---------- */
         window.generateProcessPlug = () => {
@@ -1083,9 +1022,9 @@ Search string:
                 `The Plug-In (New Action/Time): ${text('p_plug') || '(e.g., Add a 10-minute "Action Audit" where a shared tool is used to generate the next step.)'}`,
                 `Owner of the Plug-In: ${text('p_owner') || '(e.g., Instructional Coach, PLC Lead)'}`,
             ].join('\n');
-            setOut('process-plug-output', plug);
+            setOut('process-plug_output', plug);
         };
-        window.copyProcessPlug = () => copyTxt($('process-plug-output')?.textContent || '');
+        window.copyProcessPlug = () => copyTxt($('process-plug_output')?.textContent || '');
 
         /* ---------- Sell It (Value Prop) ---------- */
         window.generateSellIt = () => {
@@ -1096,9 +1035,9 @@ Search string:
                 `Solution (The Habit): ${text('v_habit')}`,
                 `Value Proposition: ${text('v_value') || 'We do [HABIT] to solve [PAIN] which achieves [OUTCOME].'}`,
             ].join('\n');
-            setOut('sell-output', value);
+            setOut('sell_output', value);
         };
-        window.copySellIt = () => copyTxt($('sell-output')?.textContent || '');
+        window.copySellIt = () => copyTxt($('sell_output')?.textContent || '');
 
         /* ---------- Guided Mode (minimal) ---------- */
         const guided = {
@@ -1162,16 +1101,13 @@ Search string:
             const openBtn = $('mobileOpenBtn');
             const closeBtn = $('mobileCloseBtn');
             
-            // Fix 2: Mobile nav toggle
             if (!openBtn || !closeBtn || !nav) return;
             const showNav = () => { nav.classList.remove('hidden'); openBtn.setAttribute('aria-expanded','true'); };
             const hideNav = () => { nav.classList.add('hidden'); openBtn.setAttribute('aria-expanded','false'); };
             
             openBtn.addEventListener('click', showNav);
             closeBtn.addEventListener('click', hideNav);
-            // click outside the panel closes it
             nav.addEventListener('click', (e) => { 
-                // Check if the click occurred on the backdrop (the nav itself)
                 if (e.target === nav) hideNav(); 
             });
         });
